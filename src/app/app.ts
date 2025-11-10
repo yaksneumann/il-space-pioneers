@@ -5,8 +5,7 @@ import { AuthService } from './core/services/auth.service';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, RouterModule],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  templateUrl: './app.html'
 })
 export class App {
   protected readonly title = signal('il-space-pioneers');

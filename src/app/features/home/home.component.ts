@@ -33,7 +33,6 @@ export class HomeComponent implements OnInit {
   }
 
   private checkApplicationStatus(): void {
-    // First check if there's a current user session
     const user = this.authService.getCurrentUser();
     if (user?.role === 'candidate') {
       const status = this.authService.getApplicationStatus(user.email);
@@ -43,19 +42,16 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    // If no user session, check if there's any application in localStorage
-    // (could be from a previous session)
     this.checkForExistingApplication();
   }
 
   private checkForExistingApplication(): void {
-    // Check if there's any application stored in localStorage
     try {
       const stored = localStorage.getItem('il_space_pioneers_application');
       if (stored) {
         const application = JSON.parse(stored);
         const daysPassed = Math.floor((Date.now() - application.submissionDate) / (1000 * 60 * 60 * 24));
-        const daysLeft = Math.max(0, 3 - daysPassed); // 3 days edit window
+        const daysLeft = Math.max(0, 3 - daysPassed);
         
         this.hasExistingApplication.set(true);
         this.candidateEmail.set(application.email);
@@ -64,7 +60,6 @@ export class HomeComponent implements OnInit {
           daysLeft: daysLeft
         });
         
-        // Set user identity for this session
         this.authService.setCandidateIdentity(application.email);
       }
     } catch (error) {
@@ -90,7 +85,6 @@ export class HomeComponent implements OnInit {
     if (email) {
       this.router.navigate(['/candidate'], { queryParams: { email: email } });
     } else {
-      // Fallback: try to get from current user
       const user = this.authService.getCurrentUser();
       if (user?.email) {
         this.router.navigate(['/candidate'], { queryParams: { email: user.email } });

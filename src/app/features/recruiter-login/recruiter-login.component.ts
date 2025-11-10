@@ -42,7 +42,6 @@ export class RecruiterLoginComponent {
       );
 
       if (success) {
-        // Redirect to dashboard
         this.router.navigate(['/dashboard']);
       } else {
         this.errorMessage.set('Invalid credentials. Please try again.');

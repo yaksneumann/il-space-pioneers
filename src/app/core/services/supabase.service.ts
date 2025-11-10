@@ -21,7 +21,6 @@ export class SupabaseService {
   constructor() {
     this.supabase = createClient(environment.supabase.url, environment.supabase.key);
     this.initializeMockData();
-    // Ensure candidate list is available from localStorage for offline/mock usage
     const stored = this.loadCandidatesFromLocalStorage();
     if (stored.length) {
       this.candidatesSubject.next(stored);
@@ -47,7 +46,6 @@ export class SupabaseService {
       ]
     };
     this.statsSubject.next(mockStats);
-    // Seed localStorage with mock candidates if not present
     const existing = localStorage.getItem(this.LOCAL_STORAGE_KEY);
     if (!existing) {
       const candidates = this.generateMockCandidates();
@@ -76,16 +74,12 @@ export class SupabaseService {
       canEdit: true
     };
     
-    // First, load existing candidates from localStorage
     const existingCandidates = this.loadCandidatesFromLocalStorage();
     
-    // Remove any existing candidate with the same email (update scenario)
     const filteredCandidates = existingCandidates.filter(c => c.email !== mockCandidate.email);
     
-    // Add the new candidate at the beginning
     const newList = [mockCandidate, ...filteredCandidates];
     
-    // Save to localStorage
     this.saveCandidatesToLocalStorage(newList);
     this.candidatesSubject.next(newList);
     
@@ -99,14 +93,12 @@ export class SupabaseService {
   }
 
   async getCandidateByEmail(email: string): Promise<Candidate | null> {
-    // Try localStorage (fast, available offline)
     const stored = this.loadCandidatesFromLocalStorage();
     const found = stored.find(c => c.email === email);
     if (found) {
       return found;
     }
 
-    // Fallback to generated mocks
     const mockCandidates = this.generateMockCandidates();
     return mockCandidates.find(c => c.email === email) || null;
   }
@@ -153,7 +145,6 @@ export class SupabaseService {
     try {
       localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(candidates));
     } catch (e) {
-      // ignore localStorage errors (e.g., storage disabled)
       console.warn('Failed to save candidates to localStorage', e);
     }
   }
@@ -164,7 +155,6 @@ export class SupabaseService {
       if (!raw) return [];
       const parsed = JSON.parse(raw) as Candidate[];
       
-      // Convert date strings back to Date objects if needed
       return parsed.map(candidate => ({
         ...candidate,
         createdAt: candidate.createdAt ? new Date(candidate.createdAt) : undefined,

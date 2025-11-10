@@ -1,55 +1,37 @@
 
-// ================================================
-// 🚀 ISRAELI SPACE AGENCY - COSMIC COMMAND CENTER THEME
-// ================================================
-
 @use '@angular/material' as mat;
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap');
 
-// ================================================
-// 🎨 COLOR PALETTE - COSMIC COMMAND CENTER
-// ================================================
-
 :root {
-  // Primary Colors
-  --color-primary: #1A1A2E;        // Charcoal
-  --color-secondary: #0F3460;      // Bright blue
-  --color-accent: #16537E;         // Neon blue
-  --color-background: #0E0E23;     // Near black
+  --color-primary: #1A1A2E;
+  --color-secondary: #0F3460;
+  --color-accent: #16537E;
+  --color-background: #0E0E23;
   
-  // Surface Colors
-  --color-surface: #16213E;        // Card backgrounds
-  --color-surface-variant: #1A2B47; // Elevated surfaces
-  --color-surface-bright: #2A3B5C; // Bright surfaces
+  --color-surface: #16213E;
+  --color-surface-variant: #1A2B47;
+  --color-surface-bright: #2A3B5C;
   
-  // Text Colors
   --color-on-primary: #FFFFFF;
   --color-on-secondary: #E8F4FF;
   --color-on-surface: #E1E8F7;
   --color-on-background: #D1DCF0;
   
-  // Special Colors
-  --color-electric-blue: #00D4FF;  // Holographic accent
-  --color-cyan: #00FFFF;           // Glow effects
-  --color-warning: #FF6B35;        // Alert states
-  --color-success: #00E676;        // Success states
-  --color-error: #FF5252;          // Error states
+  --color-electric-blue: #00D4FF;
+  --color-cyan: #00FFFF;
+  --color-warning: #FF6B35;
+  --color-success: #00E676;
+  --color-error: #FF5252;
   
-  // Gradients
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   --gradient-accent: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
   --gradient-holographic: linear-gradient(135deg, var(--color-electric-blue) 0%, var(--color-cyan) 50%, var(--color-accent) 100%);
   
-  // Shadows & Glows
   --shadow-glow-blue: 0 0 20px rgba(0, 212, 255, 0.3);
   --shadow-glow-cyan: 0 0 15px rgba(0, 255, 255, 0.4);
   --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
-
-// ================================================
-// 🎭 ANGULAR MATERIAL CUSTOM THEME
-// ================================================
 
 $cosmic-primary: mat.m2-define-palette((
   50: #E3F2FD,
@@ -132,10 +114,6 @@ html {
   ));
 }
 
-// ================================================
-// 🌌 GLOBAL STYLES & ANIMATIONS
-// ================================================
-
 * {
   box-sizing: border-box;
 }
@@ -152,21 +130,13 @@ body {
   background: var(--color-background);
   color: var(--color-on-background);
   color-scheme: dark;
-  
-  // Animated background with subtle particle effect
   background-image: 
     radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
     radial-gradient(circle at 40% 80%, rgba(22, 83, 126, 0.1) 0%, transparent 50%);
   background-attachment: fixed;
-  
-  // Smooth transitions
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-// ================================================
-// 🎯 TYPOGRAPHY SYSTEM
-// ================================================
 
 .cosmic-title {
   font-family: 'Orbitron', monospace;
@@ -190,9 +160,251 @@ body {
   line-height: 1.6;
 }
 
-// ================================================
-// 🎨 COMPONENT BASE STYLES
-// ================================================
+.cosmic-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
+}
+
+.cosmic-header {
+  background: var(--gradient-primary);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  box-shadow: var(--shadow-card);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    
+    @media (max-width: 968px) {
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+  
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    .logo-icon {
+      font-size: 2.5rem;
+      filter: drop-shadow(var(--shadow-glow-blue));
+      animation: pulse 2s infinite;
+    }
+    
+    .title-group {
+      h1 {
+        margin: 0;
+        font-size: 2rem;
+        background: var(--gradient-holographic);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-family: 'Orbitron', monospace;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        text-shadow: none;
+        
+        @media (max-width: 768px) {
+          font-size: 1.5rem;
+        }
+      }
+      
+      .subtitle {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--color-on-secondary);
+        font-weight: 300;
+        letter-spacing: 0.05em;
+        opacity: 0.9;
+        
+        @media (max-width: 768px) {
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+  
+  .cosmic-nav {
+    display: flex;
+    gap: 0.5rem;
+    
+    @media (max-width: 968px) {
+      gap: 0.25rem;
+    }
+    
+    @media (max-width: 768px) {
+      order: 2;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      color: var(--color-on-secondary);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+      background: none;
+      cursor: pointer;
+      
+      @media (max-width: 480px) {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+        
+        .nav-text {
+          display: none;
+        }
+      }
+      
+      .nav-icon {
+        font-size: 1rem;
+      }
+      
+      &:hover {
+        background: rgba(0, 212, 255, 0.1);
+        border-color: rgba(0, 212, 255, 0.3);
+        color: var(--color-electric-blue);
+        transform: translateY(-1px);
+      }
+      
+      &.active {
+        background: rgba(0, 212, 255, 0.2);
+        border-color: var(--color-electric-blue);
+        color: var(--color-electric-blue);
+        box-shadow: var(--shadow-glow-blue);
+      }
+    }
+
+    .logout-btn, .login-btn {
+      &:hover {
+        background: rgba(255, 107, 107, 0.1);
+        border-color: rgba(255, 107, 107, 0.3);
+        color: #ff6b6b;
+      }
+    }
+  }
+  
+  .mission-status {
+    @media (max-width: 768px) {
+      order: 3;
+    }
+    
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(0, 230, 118, 0.1);
+      border: 1px solid var(--color-success);
+      border-radius: 20px;
+      color: var(--color-success);
+      font-size: 0.875rem;
+      font-weight: 500;
+      
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--color-success);
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+        box-shadow: 0 0 10px var(--color-success);
+      }
+    }
+  }
+}
+
+.cosmic-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 140px);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.02) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(22, 83, 126, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+    animation: backgroundFloat 20s ease-in-out infinite;
+  }
+  
+  > * {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+.cosmic-footer {
+  background: var(--color-surface);
+  border-top: 1px solid rgba(0, 212, 255, 0.2);
+  padding: 1.5rem 0;
+  margin-top: auto;
+  
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+    
+    p {
+      margin: 0;
+      color: var(--color-on-surface);
+      opacity: 0.8;
+      font-size: 0.875rem;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      
+      .footer-link {
+        color: var(--color-electric-blue);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        &:hover {
+          color: var(--color-cyan);
+          text-shadow: var(--shadow-glow-cyan);
+        }
+      }
+    }
+  }
+}
 
 .cosmic-card {
   background: var(--color-surface);
@@ -247,10 +459,6 @@ body {
   }
 }
 
-// ================================================
-// 🌟 UTILITY CLASSES
-// ================================================
-
 .glow-blue {
   box-shadow: var(--shadow-glow-blue);
 }
@@ -274,9 +482,20 @@ body {
   animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-// ================================================
-// 🎬 KEYFRAME ANIMATIONS
-// ================================================
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  
+  @media (min-width: 768px) {
+    padding: 0 24px;
+  }
+  
+  @media (min-width: 1024px) {
+    padding: 0 32px;
+  }
+}
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -303,6 +522,18 @@ body {
   }
 }
 
+@keyframes backgroundFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-0.5deg);
+  }
+}
+
 @keyframes holographicShimmer {
   0% {
     background-position: -200% center;
@@ -312,22 +543,47 @@ body {
   }
 }
 
-// ================================================
-// 📱 RESPONSIVE BREAKPOINTS
-// ================================================
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-10px) rotate(3deg); 
+  }
+}
 
-// Mobile first approach
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
-  
-  @media (min-width: 768px) {
-    padding: 0 24px;
+@media (max-width: 480px) {
+  .cosmic-header {
+    .logo-section {
+      .logo-icon {
+        font-size: 2rem;
+      }
+    }
+    
+    .mission-status {
+      .status-indicator {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+        
+        .pulse-dot {
+          width: 6px;
+          height: 6px;
+        }
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-icon,
+  .pulse-dot,
+  .cosmic-main::before {
+    animation: none;
   }
   
-  @media (min-width: 1024px) {
-    padding: 0 32px;
+  .cosmic-card,
+  .cosmic-button,
+  .footer-link {
+    transition: none;
   }
 }
