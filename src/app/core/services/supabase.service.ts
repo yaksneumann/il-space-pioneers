@@ -13,6 +13,7 @@ export class SupabaseService {
   private readonly statsSubject = new BehaviorSubject<CandidateStats | null>(null);
   private readonly EDIT_DEADLINE_DAYS = 3;
   private readonly MS_PER_DAY = 24 * 60 * 60 * 1000;
+  private readonly LOCAL_STORAGE_KEY = 'mockCandidates';
 
   candidates$ = this.candidatesSubject.asObservable();
   stats$ = this.statsSubject.asObservable();
@@ -20,33 +21,44 @@ export class SupabaseService {
   constructor() {
     this.supabase = createClient(environment.supabase.url, environment.supabase.key);
     this.initializeMockData();
+    // Ensure candidate list is available from localStorage for offline/mock usage
+    const stored = this.loadCandidatesFromLocalStorage();
+    if (stored.length) {
+      this.candidatesSubject.next(stored);
+    }
   }
 
   private initializeMockData(): void {
     const mockStats: CandidateStats = {
       totalCandidates: 5,
       totalVisits: 150,
-      conversionRate: 28,
+      conversionRate: 15,
+      averageAge: 29,
       ageBreakdown: [
         { range: '18-25', count: 1, percentage: 20 },
-        { range: '26-35', count: 3, percentage: 60 },
-        { range: '36-45', count: 1, percentage: 20 }
+        { range: '26-35', count: 4, percentage: 80 }
       ],
       cityDistribution: [
         { city: 'Tel Aviv', count: 1 },
         { city: 'Jerusalem', count: 1 },
         { city: 'Haifa', count: 1 },
-        { city: 'Beersheba', count: 1 },
-        { city: 'Netanya', count: 1 }
-      ],
-      averageAge: 30
+        { city: 'Beer Sheva', count: 1 },
+        { city: 'Eilat', count: 1 }
+      ]
     };
     this.statsSubject.next(mockStats);
+    // Seed localStorage with mock candidates if not present
+    const existing = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+    if (!existing) {
+      const candidates = this.generateMockCandidates();
+      this.saveCandidatesToLocalStorage(candidates);
+      this.candidatesSubject.next(candidates);
+    }
   }
 
   async submitCandidate(formData: CandidateFormData): Promise<Candidate | null> {
     const mockCandidate: Candidate = {
-      id: 'mock-' + Date.now(),
+      id: 'submitted-' + Date.now(),
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
@@ -56,31 +68,52 @@ export class SupabaseService {
       hobbies: formData.hobbies,
       motivation: formData.motivation,
       profileImage: formData.profileImage ? {
-        file: formData.profileImage,
         filename: formData.profileImage.name,
-        url: 'mock-url'
+        url: 'mock-url-' + Date.now()
       } : undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
       canEdit: true
     };
     
+    // First, load existing candidates from localStorage
+    const existingCandidates = this.loadCandidatesFromLocalStorage();
+    
+    // Remove any existing candidate with the same email (update scenario)
+    const filteredCandidates = existingCandidates.filter(c => c.email !== mockCandidate.email);
+    
+    // Add the new candidate at the beginning
+    const newList = [mockCandidate, ...filteredCandidates];
+    
+    // Save to localStorage
+    this.saveCandidatesToLocalStorage(newList);
+    this.candidatesSubject.next(newList);
+    
     const currentStats = this.statsSubject.value;
     if (currentStats) {
       currentStats.totalCandidates += 1;
       this.statsSubject.next({...currentStats});
     }
-    
+
     return mockCandidate;
   }
 
   async getCandidateByEmail(email: string): Promise<Candidate | null> {
+    // Try localStorage (fast, available offline)
+    const stored = this.loadCandidatesFromLocalStorage();
+    const found = stored.find(c => c.email === email);
+    if (found) {
+      return found;
+    }
+
+    // Fallback to generated mocks
     const mockCandidates = this.generateMockCandidates();
     return mockCandidates.find(c => c.email === email) || null;
   }
 
   async getAllCandidates(): Promise<Candidate[]> {
-    return this.generateMockCandidates();
+    const stored = this.loadCandidatesFromLocalStorage();
+    return stored.length ? stored : this.generateMockCandidates();
   }
 
   async getStatistics(): Promise<CandidateStats | null> {
@@ -90,11 +123,11 @@ export class SupabaseService {
   private generateMockCandidates(): Candidate[] {
     const baseDate = Date.now();
     const mockCandidatesData = [
-      { firstName: 'David', lastName: 'Cohen', email: 'david.cohen@example.com', phoneNumber: '+972-50-123-4567', age: 28, city: 'Tel Aviv', hobbies: 'Astronomy, rock climbing, photography', motivation: 'I have always dreamed of seeing Earth from space and being part of groundbreaking Israeli space exploration.', daysAgo: 2 },
-      { firstName: 'Sarah', lastName: 'Levi', email: 'sarah.levi@example.com', phoneNumber: '+972-54-987-6543', age: 32, city: 'Jerusalem', hobbies: 'Pilot training, hiking, technology', motivation: 'As a pilot, I bring aviation experience and a deep understanding of Israeli skies. Space is the next frontier.', daysAgo: 5 },
-      { firstName: 'Yossi', lastName: 'Goldberg', email: 'yossi.goldberg@example.com', phoneNumber: '+972-52-555-0123', age: 25, city: 'Haifa', hobbies: 'Engineering, swimming, chess', motivation: 'My engineering background in aerospace systems makes me an ideal candidate for this historic mission.', daysAgo: 1 },
-      { firstName: 'Michal', lastName: 'Rosenberg', email: 'michal.rosenberg@example.com', phoneNumber: '+972-53-777-8888', age: 29, city: 'Beersheba', hobbies: 'Physics research, marathon running, chess', motivation: 'My research in astrophysics and deep space phenomena makes me uniquely qualified for this mission.', daysAgo: 3 },
-      { firstName: 'Avi', lastName: 'Shapiro', email: 'avi.shapiro@example.com', phoneNumber: '+972-52-999-1111', age: 35, city: 'Netanya', hobbies: 'Flight simulation, scuba diving, electronics', motivation: 'Former IAF pilot with extensive experience in high-stress environments and advanced navigation systems.', daysAgo: 7 }
+      { firstName: 'David', lastName: 'Cohen', email: 'david.cohen@example.com', phoneNumber: '+972-50-123-4567', age: 28, city: 'Tel Aviv', hobbies: 'Astronomy, rock climbing, photography', motivation: 'I have always dreamed of seeing Earth from space.', daysAgo: 2 },
+      { firstName: 'Sarah', lastName: 'Levi', email: 'sarah.levi@example.com', phoneNumber: '+972-50-234-5678', age: 32, city: 'Jerusalem', hobbies: 'Physics, hiking, chess', motivation: 'Space exploration represents the pinnacle of human achievement.', daysAgo: 1 },
+      { firstName: 'Michael', lastName: 'Goldberg', email: 'michael.goldberg@example.com', phoneNumber: '+972-50-345-6789', age: 26, city: 'Haifa', hobbies: 'Engineering, robotics, martial arts', motivation: 'I want to contribute to building humanity future in space.', daysAgo: 3 },
+      { firstName: 'Rachel', lastName: 'Ben-David', email: 'rachel.bendavid@example.com', phoneNumber: '+972-50-456-7890', age: 30, city: 'Beer Sheva', hobbies: 'Medicine, yoga, painting', motivation: 'Space medicine is the future of healthcare innovation.', daysAgo: 4 },
+      { firstName: 'Yaron', lastName: 'Katz', email: 'yaron.katz@example.com', phoneNumber: '+972-50-567-8901', age: 35, city: 'Eilat', hobbies: 'Astrophotography, diving, programming', motivation: 'Combining my love for technology and space exploration.', daysAgo: 5 }
     ];
 
     return mockCandidatesData.map((data, index) => {
@@ -114,5 +147,32 @@ export class SupabaseService {
         canEdit: data.daysAgo <= this.EDIT_DEADLINE_DAYS
       };
     });
+  }
+
+  private saveCandidatesToLocalStorage(candidates: Candidate[]): void {
+    try {
+      localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(candidates));
+    } catch (e) {
+      // ignore localStorage errors (e.g., storage disabled)
+      console.warn('Failed to save candidates to localStorage', e);
+    }
+  }
+
+  private loadCandidatesFromLocalStorage(): Candidate[] {
+    try {
+      const raw = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as Candidate[];
+      
+      // Convert date strings back to Date objects if needed
+      return parsed.map(candidate => ({
+        ...candidate,
+        createdAt: candidate.createdAt ? new Date(candidate.createdAt) : undefined,
+        updatedAt: candidate.updatedAt ? new Date(candidate.updatedAt) : undefined
+      }));
+    } catch (e) {
+      console.warn('Failed to load candidates from localStorage', e);
+      return [];
+    }
   }
 }

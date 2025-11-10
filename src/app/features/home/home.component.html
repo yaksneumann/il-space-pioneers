@@ -12,14 +12,14 @@
           to join our space exploration program and push the boundaries of what's possible.
         </p>
 
-        @if (applicationStatus()) {
+        @if (hasExistingApplication()) {
           <div class="status-card cosmic-card">
             <div class="status-header">
               <span class="status-icon">✅</span>
               <h3 class="cosmic-subtitle">Application Submitted</h3>
             </div>
             <div class="status-content">
-              @if (applicationStatus()!.canEdit) {
+              @if (applicationStatus()?.canEdit) {
                 <p class="cosmic-body">
                   You can still edit your application for 
                   <strong>{{ applicationStatus()!.daysLeft }} more day{{ applicationStatus()!.daysLeft !== 1 ? 's' : '' }}</strong>

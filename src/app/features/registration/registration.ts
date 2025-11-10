@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Candidate, CandidateFormData } from '../../core/models/candidate.model';
@@ -14,6 +14,7 @@ import { Candidate, CandidateFormData } from '../../core/models/candidate.model'
 export class RegistrationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly supabaseService = inject(SupabaseService);
   private readonly authService = inject(AuthService);
 
@@ -54,7 +55,10 @@ export class RegistrationComponent implements OnInit {
   ngOnInit(): void {
     this.scrollToTop();
     this.initializeForm();
-    this.checkEditMode();
+    // Wait a bit to ensure form is fully initialized before checking edit mode
+    setTimeout(() => {
+      this.checkEditMode();
+    }, 100);
   }
 
   private initializeForm(): void {
@@ -80,6 +84,38 @@ export class RegistrationComponent implements OnInit {
   }
 
   private async checkEditMode(): Promise<void> {
+    // First, check if there's an email in the query params (from edit button)
+    const queryEmail = this.route.snapshot.queryParams['email'];
+    
+    if (queryEmail) {
+      try {
+        const candidate = await this.supabaseService.getCandidateByEmail(queryEmail);
+        
+        if (candidate) {
+          this.isEditMode = true;
+          this.populateFormWithCandidateData(candidate);
+          
+          // Set user identity for this session
+          this.authService.setCandidateIdentity(queryEmail);
+          
+          // Calculate edit status
+          const appStatus = this.authService.getApplicationStatus(queryEmail);
+          if (appStatus) {
+            this.daysLeft = appStatus.daysLeft;
+            if (!appStatus.canEdit) {
+              // If edit period expired, redirect to view mode
+              this.router.navigate(['/candidate'], { queryParams: { email: queryEmail } });
+              return;
+            }
+          }
+          return;
+        }
+      } catch (error) {
+        console.error('Error loading candidate for edit from query param:', error);
+      }
+    }
+
+    // Fall back to existing logic for token-based editing
     const urlToken = this.authService.getTokenFromUrl();
     if (urlToken) {
       localStorage.setItem('iisa_candidate_token', urlToken);
@@ -326,7 +362,12 @@ export class RegistrationComponent implements OnInit {
   }
 
   clearForm(): void {
-    if (confirm('Are you sure you want to clear your application? This action cannot be undone.')) {
+    if (confirm('Are you sure you want to clear your application? This action cannot be undone. This will permanently delete your application data.')) {
+      // Get current user's email before clearing
+      const currentUser = this.authService.getCurrentUser();
+      const userEmail = currentUser?.email || this.registrationForm.get('email')?.value;
+      
+      // Clear the form
       this.registrationForm.reset();
       this.currentStep = 1;
       this.isSubmitted = false;
@@ -338,8 +379,32 @@ export class RegistrationComponent implements OnInit {
       this.imageError = undefined;
       this.selectedResume = undefined;
       this.resumeError = undefined;
+      
+      // Clear all auth and application data
       this.authService.clearCandidateToken();
+      this.authService.clearApplicationData();
+      this.authService.logout();
+      
+      // Remove candidate data from localStorage if we have an email
+      if (userEmail) {
+        this.removeCandidateFromStorage(userEmail);
+      }
+      
       this.scrollToTop();
+    }
+  }
+
+  private removeCandidateFromStorage(email: string): void {
+    try {
+      const candidatesKey = 'mockCandidates';
+      const stored = localStorage.getItem(candidatesKey);
+      if (stored) {
+        const candidates = JSON.parse(stored);
+        const filteredCandidates = candidates.filter((c: any) => c.email !== email);
+        localStorage.setItem(candidatesKey, JSON.stringify(filteredCandidates));
+      }
+    } catch (error) {
+      console.warn('Error removing candidate from localStorage:', error);
     }
   }
 }
