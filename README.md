@@ -65,11 +65,9 @@ The Israeli Imaginary Space Agency is seeking pioneering candidates for our inau
 
 4. **Start the development server**
    ```bash
-   ng serve
+   ng serve -o
    ```
    
-   Navigate to `http://localhost:4200/` - the app will automatically reload when you modify source files.
-
 ## 🏗️ Project Structure
 
 ```
@@ -126,31 +124,6 @@ src/
 - **Search & Filter** - Advanced candidate discovery
 - **Authentication** - Secure recruiter login system
 
-## 🛠️ Development Commands
-
-### Development Server
-```bash
-ng serve                    # Start development server
-ng serve --open            # Start and open in browser
-```
-
-### Building
-```bash
-ng build                   # Build for production
-ng build --configuration development  # Development build
-```
-
-### Testing
-```bash
-ng test                    # Run unit tests
-ng test --watch=false      # Run tests once
-```
-
-### Code Quality
-```bash
-ng lint                    # Run ESLint checks
-ng generate component name # Generate new component
-```
 
 ## 🌍 Environment Configuration
 
@@ -168,15 +141,6 @@ Configure Supabase credentials and authentication settings in these files.
 - **Privacy Controls** - User data management options
 - **Secure Authentication** - Recruiter login system
 - **Data Protection** - Privacy-focused design principles
-
-## 🎯 Future Roadmap
-
-- 🌐 **Internationalization** - Multi-language support
-- 📧 **Email Notifications** - Application status updates
-- 📊 **Advanced Analytics** - Enhanced dashboard metrics
-- 🔄 **Real-time Updates** - Live application status
-- 🎨 **Theme Customization** - Multiple UI themes
-- 📱 **Mobile App** - React Native companion
 
 ## 🤝 Contributing
 
@@ -196,18 +160,10 @@ This project is part of an interview demonstration and is intended for education
 
 Visit our live application: [Israeli Space Pioneers Portal](https://il-space-pioneers.vercel.app/)
 
-## 📞 Contact
-
-For questions about this project or the space mission:
-
-- **Developer**: [Your Name]
-- **Mission Control**: evgeny@space-pioneers.com
-- **Project Repository**: [GitHub Link]
-
 ---
 
 *🌟 Ready to make history? Join Israel's first space mission today! 🌟*
 
 ---
 
-**Built with ❤️ for the stars** | **Angular 18+ | TypeScript | Supabase**
+**Built with ❤️ for the stars | Angular 18+ | TypeScript**
