@@ -1,0 +1,286 @@
+@import '../../app.scss';
+
+.about-container {
+  min-height: 100vh;
+  background: $background-gradient;
+}
+
+.hero-section {
+  padding: $section-padding;
+  text-align: center;
+  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: $section-padding-mobile;
+  }
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.highlight {
+  color: $primary-color;
+  background: $primary-gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mission-statement,
+.innovation-section,
+.achievements-section,
+.vision-section {
+  padding: $section-padding;
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 3rem 0;
+  }
+}
+
+.section-title {
+  font-size: $font-size-title;
+  margin-bottom: 2rem;
+  text-align: center;
+  
+  @media (max-width: $breakpoint-mobile) {
+    font-size: 2rem;
+  }
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  
+  &.reverse {
+    .text-content {
+      order: 2;
+    }
+    
+    .image-placeholder {
+      order: 1;
+    }
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    
+    &.reverse {
+      .text-content,
+      .image-placeholder {
+        order: unset;
+      }
+    }
+  }
+}
+
+.text-content {
+  .cosmic-body {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    color: $text-secondary;
+  }
+}
+
+.image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.placeholder-card {
+  background: $card-bg;
+  border-radius: 20px;
+  border: 2px dashed $border-color;
+  padding: 4rem 2rem;
+  text-align: center;
+  width: 100%;
+  max-width: 300px;
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 2rem 1rem;
+  }
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
+  
+  @media (max-width: $breakpoint-mobile) {
+    font-size: 3rem;
+  }
+}
+
+.placeholder-text {
+  color: $text-muted;
+  font-weight: 500;
+  margin: 0;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.achievement-card {
+  padding: $card-padding;
+  text-align: center;
+  transition: $transition-base;
+  background: $card-bg;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  
+  &:hover {
+    transform: translateY(-5px);
+    background: $card-bg-hover;
+    border-color: $border-hover;
+    box-shadow: $shadow-card;
+  }
+  
+  @media (max-width: $breakpoint-small) {
+    padding: $card-padding-mobile;
+  }
+}
+
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  color: $primary-color;
+  
+  @media (max-width: $breakpoint-small) {
+    font-size: 2.5rem;
+  }
+}
+
+.innovation-list {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+}
+
+.innovation-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: $card-bg;
+  border-radius: 12px;
+  border-left: 3px solid $primary-color;
+  transition: $transition-base;
+  
+  &:hover {
+    background: $card-bg-hover;
+  }
+  
+  .item-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    color: $primary-color;
+  }
+  
+  strong {
+    color: $primary-color;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+}
+
+.vision-section {
+  background: $section-bg;
+}
+
+.vision-content {
+  text-align: center;
+}
+
+.vision-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vision-card {
+  background: $card-bg-hover;
+  border: 1px solid $border-accent;
+  border-radius: 16px;
+  padding: $card-padding;
+  text-align: center;
+  transition: $transition-base;
+  
+  &:hover {
+    transform: translateY(-5px);
+    border-color: $border-hover;
+    box-shadow: 0 8px 32px rgba(74, 144, 226, 0.3);
+  }
+  
+  @media (max-width: $breakpoint-small) {
+    padding: $card-padding-mobile;
+  }
+}
+
+.cta-section {
+  padding: $section-padding;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(116, 185, 255, 0.05) 100%);
+  
+  @media (max-width: $breakpoint-small) {
+    padding: $section-padding-mobile;
+  }
+}
+
+.cta-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cta-button {
+  font-size: $font-size-subtitle;
+  padding: 1.25rem 2.5rem;
+  margin-top: 2rem;
+  background: $primary-gradient;
+  border: none;
+  border-radius: 8px;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-base;
+  font-weight: 600;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-hover;
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-10px) rotate(3deg); 
+  }
+}

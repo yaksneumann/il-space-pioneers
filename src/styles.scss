@@ -1,1 +1,333 @@
-/* You can add global styles to this file, and also import other style files */
+
+// ================================================
+// 🚀 ISRAELI SPACE AGENCY - COSMIC COMMAND CENTER THEME
+// ================================================
+
+@use '@angular/material' as mat;
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap');
+
+// ================================================
+// 🎨 COLOR PALETTE - COSMIC COMMAND CENTER
+// ================================================
+
+:root {
+  // Primary Colors
+  --color-primary: #1A1A2E;        // Charcoal
+  --color-secondary: #0F3460;      // Bright blue
+  --color-accent: #16537E;         // Neon blue
+  --color-background: #0E0E23;     // Near black
+  
+  // Surface Colors
+  --color-surface: #16213E;        // Card backgrounds
+  --color-surface-variant: #1A2B47; // Elevated surfaces
+  --color-surface-bright: #2A3B5C; // Bright surfaces
+  
+  // Text Colors
+  --color-on-primary: #FFFFFF;
+  --color-on-secondary: #E8F4FF;
+  --color-on-surface: #E1E8F7;
+  --color-on-background: #D1DCF0;
+  
+  // Special Colors
+  --color-electric-blue: #00D4FF;  // Holographic accent
+  --color-cyan: #00FFFF;           // Glow effects
+  --color-warning: #FF6B35;        // Alert states
+  --color-success: #00E676;        // Success states
+  --color-error: #FF5252;          // Error states
+  
+  // Gradients
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
+  --gradient-holographic: linear-gradient(135deg, var(--color-electric-blue) 0%, var(--color-cyan) 50%, var(--color-accent) 100%);
+  
+  // Shadows & Glows
+  --shadow-glow-blue: 0 0 20px rgba(0, 212, 255, 0.3);
+  --shadow-glow-cyan: 0 0 15px rgba(0, 255, 255, 0.4);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+// ================================================
+// 🎭 ANGULAR MATERIAL CUSTOM THEME
+// ================================================
+
+$cosmic-primary: mat.m2-define-palette((
+  50: #E3F2FD,
+  100: #BBDEFB,
+  200: #90CAF9,
+  300: #64B5F6,
+  400: #42A5F5,
+  500: #0F3460,
+  600: #1E88E5,
+  700: #1976D2,
+  800: #1565C0,
+  900: #0D47A1,
+  A100: #82B1FF,
+  A200: #448AFF,
+  A400: #2979FF,
+  A700: #2962FF,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+));
+
+$cosmic-accent: mat.m2-define-palette((
+  50: #E0F7FA,
+  100: #B2EBF2,
+  200: #80DEEA,
+  300: #4DD0E1,
+  400: #26C6DA,
+  500: #16537E,
+  600: #00BCD4,
+  700: #0097A7,
+  800: #00838F,
+  900: #006064,
+  A100: #84FFFF,
+  A200: #18FFFF,
+  A400: #00E5FF,
+  A700: #00B8D4,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: rgba(black, 0.87),
+    A700: rgba(black, 0.87),
+  )
+));
+
+html {
+  @include mat.m2-theme((
+    color: (
+      primary: $cosmic-primary,
+      accent: $cosmic-accent,
+      theme-type: dark,
+    ),
+    typography: (
+      brand-family: 'Orbitron',
+      plain-family: 'Exo 2'
+    ),
+    density: 0,
+  ));
+}
+
+// ================================================
+// 🌌 GLOBAL STYLES & ANIMATIONS
+// ================================================
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Exo 2', sans-serif;
+  background: var(--color-background);
+  color: var(--color-on-background);
+  color-scheme: dark;
+  
+  // Animated background with subtle particle effect
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(22, 83, 126, 0.1) 0%, transparent 50%);
+  background-attachment: fixed;
+  
+  // Smooth transitions
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ================================================
+// 🎯 TYPOGRAPHY SYSTEM
+// ================================================
+
+.cosmic-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  text-shadow: var(--shadow-glow-blue);
+  letter-spacing: 0.05em;
+}
+
+.cosmic-subtitle {
+  font-family: 'Orbitron', monospace;
+  font-weight: 500;
+  color: var(--color-on-surface);
+  letter-spacing: 0.02em;
+}
+
+.cosmic-body {
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 400;
+  color: var(--color-on-surface);
+  line-height: 1.6;
+}
+
+// ================================================
+// 🎨 COMPONENT BASE STYLES
+// ================================================
+
+.cosmic-card {
+  background: var(--color-surface);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    border-color: rgba(0, 212, 255, 0.4);
+    box-shadow: var(--shadow-glow-blue), var(--shadow-elevated);
+    transform: translateY(-2px);
+  }
+}
+
+.cosmic-button {
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: 8px;
+  color: var(--color-on-primary);
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 600;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  &:hover {
+    box-shadow: var(--shadow-glow-blue);
+    transform: translateY(-1px);
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ================================================
+// 🌟 UTILITY CLASSES
+// ================================================
+
+.glow-blue {
+  box-shadow: var(--shadow-glow-blue);
+}
+
+.glow-cyan {
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.text-gradient {
+  background: var(--gradient-holographic);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.slide-up {
+  animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+// ================================================
+// 🎬 KEYFRAME ANIMATIONS
+// ================================================
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes holographicShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+// ================================================
+// 📱 RESPONSIVE BREAKPOINTS
+// ================================================
+
+// Mobile first approach
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  
+  @media (min-width: 768px) {
+    padding: 0 24px;
+  }
+  
+  @media (min-width: 1024px) {
+    padding: 0 32px;
+  }
+}

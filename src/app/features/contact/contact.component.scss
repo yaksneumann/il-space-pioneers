@@ -1,0 +1,285 @@
+@import '../../app.scss';
+
+.contact-container {
+  min-height: 100vh;
+  background: $background-gradient;
+}
+
+.hero-section {
+  padding: 6rem 0 4rem 0;
+  text-align: center;
+  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: $section-padding-mobile;
+  }
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.highlight {
+  color: $primary-color;
+  background: $primary-gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.contact-section {
+  padding: 4rem 0;
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 3rem 0;
+  }
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  
+  @media (max-width: $breakpoint-tablet) {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+.form-container {
+  .form-card {
+    padding: 3rem;
+    background: $card-bg;
+    border-radius: 12px;
+    border: 1px solid $border-color;
+    
+    @media (max-width: $breakpoint-mobile) {
+      padding: $card-padding-mobile;
+    }
+    
+    @media (max-width: $breakpoint-small) {
+      padding: 1.5rem;
+    }
+  }
+}
+
+.form-title {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.success-message {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: bounce 2s infinite;
+  color: $success-color;
+  
+  @media (max-width: $breakpoint-small) {
+    font-size: 3rem;
+  }
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: $primary-color;
+  font-size: $font-size-small;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  padding: 1rem;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  background: $card-bg;
+  color: $text-primary;
+  font-size: $font-size-body;
+  transition: $transition-base;
+  
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    background: $card-bg-hover;
+    box-shadow: $shadow-focus;
+  }
+  
+  &.error {
+    border-color: $error-color;
+    box-shadow: 0 0 0 1px rgba(255, 107, 107, 0.3);
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    font-size: 0.95rem;
+  }
+}
+
+.form-select {
+  cursor: pointer;
+  
+  option {
+    background: #1a1a3a;
+    color: $text-primary;
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+.form-actions {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.submit-button {
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+  margin-bottom: 1rem;
+  background: $primary-gradient;
+  border: none;
+  border-radius: 8px;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-base;
+  font-weight: 600;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: $shadow-card;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  @media (max-width: $breakpoint-small) {
+    width: 100%;
+    padding: 1.25rem;
+  }
+}
+
+.form-note {
+  font-size: 0.85rem;
+  color: $text-muted;
+  margin: 0;
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.info-card {
+  padding: $card-padding;
+  background: $card-bg;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: $card-padding-mobile;
+  }
+  
+  @media (max-width: $breakpoint-small) {
+    padding: 1.5rem;
+  }
+}
+
+.contact-info {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  transition: $transition-base;
+  
+  &:hover {
+    background: $card-bg;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    gap: 1rem;
+  }
+  
+  @media (max-width: $breakpoint-small) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.contact-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+  color: $primary-color;
+  
+  @media (max-width: $breakpoint-mobile) {
+    font-size: 1.5rem;
+  }
+}
+
+.contact-details {
+  flex: 1;
+}
+
+.contact-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $primary-color;
+  margin: 0 0 0.5rem 0;
+}
+
+.contact-text {
+  color: $text-secondary;
+  margin: 0;
+  line-height: 1.6;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}

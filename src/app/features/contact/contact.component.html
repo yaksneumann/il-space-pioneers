@@ -1,0 +1,170 @@
+<div class="contact-container">
+  
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="cosmic-title">
+          Contact <span class="highlight">IISA</span>
+        </h1>
+        <p class="cosmic-subtitle">
+          Get in touch with our team. We're here to help with your space exploration journey.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-section">
+    <div class="container">
+      <div class="contact-grid">
+        
+        <div class="form-container">
+          <div class="form-card cosmic-card">
+            @if (isSubmitted) {
+              <div class="success-message">
+                <div class="success-icon">✅</div>
+                <h3 class="cosmic-subtitle">Message Sent Successfully!</h3>
+                <p class="cosmic-body">
+                  Thank you for contacting IISA. Our team will review your message and 
+                  get back to you within 24-48 hours.
+                </p>
+              </div>
+            } @else {
+              <h2 class="cosmic-subtitle form-title">Send us a Message</h2>
+              
+              <form (ngSubmit)="onSubmit()" #contactForm="ngForm" class="contact-form">
+                
+                <div class="form-group">
+                  <label for="name" class="form-label">Full Name *</label>
+                  <input 
+                    type="text" 
+                    id="name"
+                    name="name"
+                    [(ngModel)]="formData.name"
+                    required
+                    class="form-input"
+                    placeholder="Enter your full name"
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="email" class="form-label">Email Address *</label>
+                  <input 
+                    type="email" 
+                    id="email"
+                    name="email"
+                    [(ngModel)]="formData.email"
+                    required
+                    class="form-input"
+                    placeholder="your.email@example.com"
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="subject" class="form-label">Subject *</label>
+                  <select 
+                    id="subject"
+                    name="subject"
+                    [(ngModel)]="formData.subject"
+                    required
+                    class="form-select"
+                  >
+                    @for (option of subjectOptions; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="message" class="form-label">Message *</label>
+                  <textarea 
+                    id="message"
+                    name="message"
+                    [(ngModel)]="formData.message"
+                    required
+                    rows="6"
+                    class="form-textarea"
+                    placeholder="Tell us how we can help you..."
+                  ></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button 
+                    type="submit" 
+                    class="cosmic-button submit-button"
+                    [disabled]="!isFormValid() || isSubmitting || isSubmitted"
+                  >
+                    @if (isSubmitting) {
+                      <span class="btn-icon">⏳</span>
+                      <span>Sending...</span>
+                    } @else {
+                      <span class="btn-icon">📤</span>
+                      <span>Send Message</span>
+                    }
+                  </button>
+                  
+                  <p class="form-note">
+                    * Required fields
+                  </p>
+                </div>
+
+              </form>
+            }
+          </div>
+        </div>
+
+        <div class="info-container">
+          <div class="info-card cosmic-card">
+            <h3 class="cosmic-subtitle">Get in Touch</h3>
+            <p class="cosmic-body">
+              Ready to join the mission or have questions about our space exploration program? 
+              We'd love to hear from you.
+            </p>
+
+            <div class="contact-info">
+              <div class="contact-item">
+                <div class="contact-icon">📧</div>
+                <div class="contact-details">
+                  <h4 class="contact-title">Email</h4>
+                  <p class="contact-text">info@iisa-space.gov.il</p>
+                </div>
+              </div>
+
+              <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <div class="contact-details">
+                  <h4 class="contact-title">Phone</h4>
+                  <p class="contact-text">+972-3-555-5555</p>
+                </div>
+              </div>
+
+              <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div class="contact-details">
+                  <h4 class="contact-title">Address</h4>
+                  <p class="contact-text">
+                    IISA Headquarters<br>
+                    123 Innovation Boulevard<br>
+                    Tel Aviv, Israel 69000
+                  </p>
+                </div>
+              </div>
+
+              <div class="contact-item">
+                <div class="contact-icon">🕒</div>
+                <div class="contact-details">
+                  <h4 class="contact-title">Office Hours</h4>
+                  <p class="contact-text">
+                    Sunday - Thursday: 8:00 - 18:00<br>
+                    Friday: 8:00 - 13:00
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>

@@ -1,0 +1,220 @@
+@import '../../app.scss';
+
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a23 0%, #1a1a3a 50%, #2a2a4a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.login-card {
+  padding: 3rem;
+  text-align: center;
+  background: $card-bg;
+  backdrop-filter: blur(10px);
+  border: 1px solid $border-accent;
+  border-radius: 12px;
+  box-shadow: $shadow-card;
+}
+
+.login-header {
+  margin-bottom: 2.5rem;
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    
+    .logo-icon {
+      font-size: 3rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    h1 {
+      font-size: $font-size-hero;
+      margin: 0;
+      color: $primary-color;
+    }
+  }
+  
+  h2 {
+    font-size: $font-size-title;
+    margin: 0 0 1rem 0;
+    color: $primary-color;
+  }
+  
+  p {
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.login-form {
+  text-align: left;
+  margin-bottom: 2rem;
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .field-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $primary-color;
+    font-weight: 500;
+    font-size: $font-size-small;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .cosmic-input {
+    width: 100%;
+    padding: 1rem;
+    background: $card-bg-hover;
+    border: 1px solid $border-accent;
+    border-radius: 8px;
+    color: $text-primary;
+    font-size: $font-size-body;
+    transition: $transition-base;
+    box-sizing: border-box;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: $shadow-focus;
+      background: $card-bg;
+    }
+    
+    &::placeholder {
+      color: $text-subtle;
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+  
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 8px;
+    color: $error-color;
+    font-size: $font-size-small;
+    margin-bottom: 1.5rem;
+  }
+  
+  .login-button {
+    width: 100%;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    background: $primary-gradient;
+    color: $text-primary;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition-transform;
+    
+    &:hover:not(:disabled) {
+      box-shadow: $shadow-hover;
+      transform: translateY(-1px);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+  
+  .button-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+.login-footer {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid $border-accent;
+  
+  p {
+    margin-bottom: 1rem;
+    color: $text-secondary;
+    font-size: $font-size-small;
+  }
+  
+  .cosmic-button.secondary {
+    background: transparent;
+    border: 1px solid $border-accent;
+    color: $primary-color;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: $transition-base;
+    
+    &:hover {
+      background: rgba(74, 144, 226, 0.1);
+      border-color: $primary-color;
+    }
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-10px) rotate(5deg); 
+  }
+}
+
+@keyframes spin {
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .login-card {
+    padding: 2rem;
+    margin: 1rem;
+  }
+
+  .login-header .logo {
+    .logo-icon {
+      font-size: 2.5rem;
+    }
+    
+    h1 {
+      font-size: $font-size-title;
+    }
+  }
+}

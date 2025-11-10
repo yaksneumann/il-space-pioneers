@@ -1,0 +1,79 @@
+<div class="login-container">
+  <div class="container">
+    <div class="login-card">
+      
+      <div class="login-header">
+        <div class="logo">
+          <span class="logo-icon">🚀</span>
+          <h1>Space Pioneers</h1>
+        </div>
+        <h2>Recruiter Access</h2>
+        <p>Access the recruitment dashboard</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="login-form">
+        
+        <div class="form-group">
+          <label for="email" class="field-label">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email"
+            [(ngModel)]="credentials.email"
+            class="cosmic-input"
+            placeholder="recruiter@space-pioneers.com"
+            required
+            [disabled]="isLoading()"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="field-label">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password"
+            [(ngModel)]="credentials.password"
+            class="cosmic-input"
+            placeholder="Enter your password"
+            required
+            [disabled]="isLoading()"
+          >
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-message">
+            <span class="error-icon">⚠️</span>
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <button 
+          type="submit" 
+          class="cosmic-button login-button"
+          [disabled]="isLoading() || !isFormValid()"
+        >
+          @if (isLoading()) {
+            <div class="button-loading">
+              <div class="loading-spinner"></div>
+              <span>Authenticating...</span>
+            </div>
+          } @else {
+            <span class="btn-icon">🔐</span>
+            <span>Access Dashboard</span>
+          }
+        </button>
+
+      </form>
+
+      <div class="login-footer">
+        <p>Looking to apply for a position?</p>
+        <button (click)="goToRegistration()" class="cosmic-button secondary">
+          <span class="btn-icon">👨‍🚀</span>
+          Apply as Candidate
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

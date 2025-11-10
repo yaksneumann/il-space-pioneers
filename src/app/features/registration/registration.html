@@ -1,0 +1,438 @@
+<div class="registration-container">
+  <div class="container">
+    
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>Join the First Israeli Space Mission</h1>
+        <p class="hero-subtitle">
+          The Israeli Imaginary Space Agency is seeking pioneering candidates for our inaugural space flight.
+          Are you ready to make history among the stars?
+        </p>
+        <div class="mission-stats">
+          <div class="stat-item">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Israeli Mission</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ daysLeft }}</span>
+            <span class="stat-label">Days Left</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="form-container">
+        
+        <div class="form-header">
+          <h2>Mission Application Form</h2>
+          <p class="form-description">
+            Complete your application to join this historic space mission. 
+            You can edit your submission within 3 days of registration.
+          </p>
+        </div>
+
+        @if (!isEditMode) {
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="formProgress"></div>
+            </div>
+            <span class="progress-text">{{ formProgress }}% Complete</span>
+          </div>
+        }
+
+        @if (isEditMode && candidateToken) {
+          <div class="edit-banner">
+            <div class="edit-content">
+              <span class="edit-icon">✏️</span>
+              <div>
+                <h3>Editing Your Application</h3>
+                <p>You can modify your submission until {{ editTimeRemaining }}</p>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (!isEditMode) {
+          <div class="application-banner">
+            <div class="application-content">
+              <span class="application-icon">🚀</span>
+              <div>
+                <h3>Fill in Your Application</h3>
+                <p>Complete your space mission application. You'll have 3 days to edit after submission.</p>
+              </div>
+            </div>
+          </div>
+        }
+
+        <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="cosmic-form">
+          
+          <div class="form-step" [class.active]="currentStep === 1">
+            <h3 class="step-title">
+              <span class="step-number">01</span>
+              Personal Information
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="firstName" class="field-label">First Name *</label>
+                <input
+                  id="firstName"
+                  type="text"
+                  formControlName="firstName"
+                  class="cosmic-input"
+                  placeholder="Enter your first name"
+                  [class.error]="firstName.invalid && firstName.touched"
+                />
+                @if (firstName.invalid && firstName.touched) {
+                  <div class="field-error">First name is required</div>
+                }
+              </div>
+
+              <div class="form-field">
+                <label for="lastName" class="field-label">Last Name *</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  formControlName="lastName"
+                  class="cosmic-input"
+                  placeholder="Enter your last name"
+                  [class.error]="lastName.invalid && lastName.touched"
+                />
+                @if (lastName.invalid && lastName.touched) {
+                  <div class="field-error">Last name is required</div>
+                }
+              </div>
+
+              <div class="form-field">
+                <label for="email" class="field-label">Email Address *</label>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  class="cosmic-input"
+                  placeholder="your.email@example.com"
+                  [class.error]="email.invalid && email.touched"
+                />
+                @if (email.invalid && email.touched) {
+                  <div class="field-error">
+                    @if (email.errors?.['required']) {
+                      <span>Email is required</span>
+                    }
+                    @if (email.errors?.['email']) {
+                      <span>Please enter a valid email</span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="form-field">
+                <label for="phoneNumber" class="field-label">Phone Number *</label>
+                <input
+                  id="phoneNumber"
+                  type="tel"
+                  formControlName="phoneNumber"
+                  class="cosmic-input"
+                  placeholder="+972-XX-XXX-XXXX"
+                  [class.error]="phoneNumber.invalid && phoneNumber.touched"
+                />
+                @if (phoneNumber.invalid && phoneNumber.touched) {
+                  <div class="field-error">Phone number is required</div>
+                }
+              </div>
+
+              <div class="form-field">
+                <label for="age" class="field-label">Age *</label>
+                <input
+                  id="age"
+                  type="number"
+                  formControlName="age"
+                  class="cosmic-input"
+                  placeholder="25"
+                  min="18"
+                  max="65"
+                  [class.error]="age.invalid && age.touched"
+                />
+                @if (age.invalid && age.touched) {
+                  <div class="field-error">
+                    @if (age.errors?.['required']) {
+                      <span>Age is required</span>
+                    }
+                    @if (age.errors?.['min']) {
+                      <span>Must be at least 18 years old</span>
+                    }
+                    @if (age.errors?.['max']) {
+                      <span>Must be 65 years or younger</span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="form-field">
+                <label for="city" class="field-label">City/Region *</label>
+                <input
+                  id="city"
+                  type="text"
+                  formControlName="city"
+                  class="cosmic-input"
+                  placeholder="Tel Aviv"
+                  [class.error]="city.invalid && city.touched"
+                />
+                @if (city.invalid && city.touched) {
+                  <div class="field-error">City is required</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step" [class.active]="currentStep === 2">
+            <h3 class="step-title">
+              <span class="step-number">02</span>
+              Tell Us About Yourself
+            </h3>
+
+            <div class="form-grid">
+              <div class="form-field full-width">
+                <label for="hobbies" class="field-label">Hobbies & Interests *</label>
+                <textarea
+                  id="hobbies"
+                  formControlName="hobbies"
+                  class="cosmic-textarea"
+                  placeholder="Share your hobbies, interests, and activities that make you unique..."
+                  rows="4"
+                  [class.error]="hobbies.invalid && hobbies.touched"
+                ></textarea>
+                <div class="field-info">
+                  <span class="char-count">{{ hobbies.value?.length || 0 }}/500 characters</span>
+                </div>
+                @if (hobbies.invalid && hobbies.touched) {
+                  <div class="field-error">Please share your hobbies and interests</div>
+                }
+              </div>
+
+              <div class="form-field full-width">
+                <label for="motivation" class="field-label">Why Are You Perfect for This Mission? *</label>
+                <textarea
+                  id="motivation"
+                  formControlName="motivation"
+                  class="cosmic-textarea"
+                  placeholder="Explain why you would be the perfect candidate for Israel's first space mission..."
+                  rows="6"
+                  [class.error]="motivation.invalid && motivation.touched"
+                ></textarea>
+                <div class="field-info">
+                  <span class="char-count">{{ motivation.value?.length || 0 }}/1000 characters</span>
+                </div>
+                @if (motivation.invalid && motivation.touched) {
+                  <div class="field-error">Please explain why you're perfect for this mission</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step" [class.active]="currentStep === 3">
+            <h3 class="step-title">
+              <span class="step-number">03</span>
+              Profile Image & Resume
+            </h3>
+
+            <div class="upload-grid">
+              <div class="upload-section">
+                <h4 class="upload-section-title">Profile Photo</h4>
+                <div class="image-upload-section">
+                  <div class="upload-area" 
+                       [class.has-image]="selectedImage"
+                       (click)="fileInput.click()"
+                       (dragover)="onDragOver($event)"
+                       (dragleave)="onDragLeave($event)"
+                       (drop)="onDrop($event)">
+                    
+                    @if (selectedImage) {
+                      <div class="image-preview">
+                        <img [src]="imagePreview" alt="Profile preview" />
+                        <div class="image-overlay">
+                          <button type="button" class="change-image-btn cosmic-button">
+                            Change Image
+                          </button>
+                        </div>
+                      </div>
+                    }
+
+                    @if (!selectedImage) {
+                      <div class="upload-prompt">
+                        <div class="upload-icon">📸</div>
+                        <h4>Upload Your Profile Photo</h4>
+                        <p>Drag and drop or click to select</p>
+                        <p class="upload-specs">JPEG or PNG • Max 5MB</p>
+                      </div>
+                    }
+                  </div>
+
+                  <input #fileInput
+                         type="file"
+                         accept="image/jpeg,image/png"
+                         (change)="onImageSelected($event)"
+                         style="display: none">
+
+                  @if (imageError) {
+                    <div class="field-error">{{ imageError }}</div>
+                  }
+                </div>
+              </div>
+
+              <div class="upload-section">
+                <h4 class="upload-section-title">Resume / CV</h4>
+                <div class="resume-upload-section">
+                  <div class="upload-area" 
+                       [class.has-file]="selectedResume"
+                       (click)="resumeInput.click()"
+                       (dragover)="onResumeDragOver($event)"
+                       (dragleave)="onResumeDragLeave($event)"
+                       (drop)="onResumeDrop($event)">
+                    
+                    @if (selectedResume) {
+                      <div class="file-preview">
+                        <div class="file-icon">📄</div>
+                        <div class="file-info">
+                          <div class="file-name">{{ selectedResume.name }}</div>
+                          <div class="file-size">{{ getFileSize(selectedResume.size) }}</div>
+                        </div>
+                        <div class="file-overlay">
+                          <button type="button" class="change-file-btn cosmic-button">
+                            Change Resume
+                          </button>
+                        </div>
+                      </div>
+                    }
+
+                    @if (!selectedResume) {
+                      <div class="upload-prompt">
+                        <div class="upload-icon">📄</div>
+                        <h4>Upload Your Resume</h4>
+                        <p>Drag and drop or click to select</p>
+                        <p class="upload-specs">PDF, DOC, DOCX • Max 10MB</p>
+                      </div>
+                    }
+                  </div>
+
+                  <input #resumeInput
+                         type="file"
+                         accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                         (change)="onResumeSelected($event)"
+                         style="display: none">
+
+                  @if (resumeError) {
+                    <div class="field-error">{{ resumeError }}</div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-navigation">
+            @if (currentStep > 1) {
+              <button type="button" 
+                      class="nav-button prev-button"
+                      (click)="previousStep()">
+                ← Previous
+              </button>
+            }
+
+            <div class="nav-center">
+              <button type="button" 
+                      class="nav-button clear-button"
+                      (click)="clearForm()">
+                🗑️ Clear Form
+              </button>
+            </div>
+
+            @if (currentStep < 3) {
+              <button type="button" 
+                      class="nav-button next-button cosmic-button"
+                      (click)="nextStep()"
+                      [disabled]="!isStepValid(currentStep)">
+                Next →
+              </button>
+            }
+
+            @if (currentStep === 3) {
+              <button type="submit" 
+                      class="submit-button cosmic-button"
+                      [disabled]="registrationForm.invalid || isSubmitting || isSubmitted">
+                @if (!isSubmitting) {
+                  <span>
+                    {{ isEditMode ? 'Update Application' : 'Submit Application' }}
+                  </span>
+                }
+                @if (isSubmitting) {
+                  <span class="loading-text">
+                    <span class="spinner"></span>
+                    {{ isEditMode ? 'Updating...' : 'Submitting...' }}
+                  </span>
+                }
+              </button>
+            }
+          </div>
+        </form>
+
+        @if (isSubmitted) {
+          <div class="success-message">
+            <div class="success-content">
+              <div class="success-icon">🚀</div>
+              <h3>Application {{ isEditMode ? 'Updated' : 'Submitted' }} Successfully!</h3>
+              @if (!isEditMode) {
+                <p>
+                  Welcome to the Israeli Space Mission! Your application has been received.
+                  You can edit your submission within 3 days if needed.
+                </p>
+              }
+              @if (isEditMode) {
+                <p>
+                  Your application has been updated successfully. You can continue to edit it within 3 days of the original submission.
+                </p>
+              } @else {
+                <p>
+                  Your application is now part of our mission database. You can view and edit it within 3 days of submission.
+                </p>
+              }
+              <div class="success-actions">
+                <a [routerLink]="['/application']" [queryParams]="{email: email.value}" class="cosmic-button primary">
+                  <span class="btn-icon">👤</span>
+                  View My Application
+                </a>
+                <button type="button" (click)="clearForm()" class="cosmic-button secondary">
+                  <span class="btn-icon">🗑️</span>
+                  Clear My Application
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+    </section>
+
+    <section class="info-section">
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">🌟</div>
+          <h3>Historic Mission</h3>
+          <p>Be part of the first 100% Israeli space flight and make history.</p>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-icon">🔒</div>
+          <h3>Secure & Private</h3>
+          <p>Your information is protected and will only be used for mission selection.</p>
+        </div>
+        
+        <div class="info-card">
+          <div class="info-icon">✏️</div>
+          <h3>Edit</h3>
+          <p>You can modify your application within 3 days of submission.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

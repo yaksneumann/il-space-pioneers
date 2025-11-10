@@ -1,0 +1,181 @@
+<div class="home-container">
+  
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="cosmic-title hero-title">
+          Join the Mission to
+          <span class="highlight">Explore Space</span>
+        </h1>
+        <p class="cosmic-subtitle hero-subtitle">
+          Be part of humanity's greatest adventure. We're looking for exceptional individuals 
+          to join our space exploration program and push the boundaries of what's possible.
+        </p>
+
+        @if (applicationStatus()) {
+          <div class="status-card cosmic-card">
+            <div class="status-header">
+              <span class="status-icon">✅</span>
+              <h3 class="cosmic-subtitle">Application Submitted</h3>
+            </div>
+            <div class="status-content">
+              @if (applicationStatus()!.canEdit) {
+                <p class="cosmic-body">
+                  You can still edit your application for 
+                  <strong>{{ applicationStatus()!.daysLeft }} more day{{ applicationStatus()!.daysLeft !== 1 ? 's' : '' }}</strong>
+                </p>
+                <div class="status-actions">
+                  <button (click)="editApplication()" class="cosmic-button">
+                    <span class="btn-icon">✏️</span>
+                    Edit Application
+                  </button>
+                  <button (click)="viewApplication()" class="cosmic-button secondary">
+                    <span class="btn-icon">👁️</span>
+                    View Details
+                  </button>
+                </div>
+              } @else {
+                <p class="cosmic-body">
+                  Your edit period has expired. You can view your application or submit a new one.
+                </p>
+                <div class="status-actions">
+                  <button (click)="viewApplication()" class="cosmic-button">
+                    <span class="btn-icon">👁️</span>
+                    View Application
+                  </button>
+                  <button (click)="newApplication()" class="cosmic-button secondary">
+                    <span class="btn-icon">📝</span>
+                    New Application
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="hero-cta">
+            <button (click)="startApplication()" class="cosmic-button cta-button">
+              <span class="btn-icon">🚀</span>
+              <span>Apply Now</span>
+            </button>
+            <p class="cta-note">Application takes ~5 minutes</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="mission-section">
+    <div class="container">
+      <h2 class="cosmic-title section-title">The Mission</h2>
+      
+      <div class="mission-grid">
+        <div class="mission-card cosmic-card">
+          <div class="card-icon">🌌</div>
+          <h3 class="cosmic-subtitle">Deep Space Exploration</h3>
+          <p class="cosmic-body">
+            Join multi-year missions to explore distant galaxies, conduct scientific research, 
+            and establish humanity's presence beyond Earth.
+          </p>
+        </div>
+
+        <div class="mission-card cosmic-card">
+          <div class="card-icon">🔬</div>
+          <h3 class="cosmic-subtitle">Scientific Research</h3>
+          <p class="cosmic-body">
+            Conduct groundbreaking experiments in zero gravity, study cosmic phenomena, 
+            and contribute to our understanding of the universe.
+          </p>
+        </div>
+
+        <div class="mission-card cosmic-card">
+          <div class="card-icon">🏗️</div>
+          <h3 class="cosmic-subtitle">Space Infrastructure</h3>
+          <p class="cosmic-body">
+            Help build space stations, lunar bases, and Mars colonies that will serve 
+            as stepping stones for future generations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="requirements-section">
+    <div class="container">
+      <h2 class="cosmic-title section-title">What We're Looking For</h2>
+      
+      <div class="requirements-content">
+        <div class="requirements-list">
+          <div class="requirement-item">
+            <span class="req-icon">🎓</span>
+            <div class="req-content">
+              <h4 class="req-title">Education</h4>
+              <p class="req-description">Advanced degree in STEM fields preferred</p>
+            </div>
+          </div>
+
+          <div class="requirement-item">
+            <span class="req-icon">💪</span>
+            <div class="req-content">
+              <h4 class="req-title">Physical Fitness</h4>
+              <p class="req-description">Excellent health and physical conditioning</p>
+            </div>
+          </div>
+
+          <div class="requirement-item">
+            <span class="req-icon">🧠</span>
+            <div class="req-content">
+              <h4 class="req-title">Mental Resilience</h4>
+              <p class="req-description">Ability to handle stress and isolation</p>
+            </div>
+          </div>
+
+          <div class="requirement-item">
+            <span class="req-icon">🤝</span>
+            <div class="req-content">
+              <h4 class="req-title">Teamwork</h4>
+              <p class="req-description">Excellent collaboration and communication skills</p>
+            </div>
+          </div>
+
+          <div class="requirement-item">
+            <span class="req-icon">🎯</span>
+            <div class="req-content">
+              <h4 class="req-title">Adaptability</h4>
+              <p class="req-description">Quick thinking and problem-solving abilities</p>
+            </div>
+          </div>
+
+          <div class="requirement-item">
+            <span class="req-icon">🌟</span>
+            <div class="req-content">
+              <h4 class="req-title">Passion</h4>
+              <p class="req-description">Genuine enthusiasm for space exploration</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="requirements-image">
+          <div class="astronaut-placeholder">
+            <span class="astronaut-icon">👨‍🚀</span>
+            <p class="placeholder-text">Your journey to the stars begins here</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <span class="logo-icon">🚀</span>
+          <span class="logo-text">Space Pioneers</span>
+        </div>
+        <p class="footer-text">
+          Advancing humanity's presence in space through innovation, exploration, and discovery.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+</div>
