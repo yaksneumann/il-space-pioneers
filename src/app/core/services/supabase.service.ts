@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { BehaviorSubject } from 'rxjs';
 import { Candidate, CandidateFormData, CandidateStats } from '../models/candidate.model';
-import { environment } from '../../../environments/environment';
-
+import { environment } from '@env';
 @Injectable({
   providedIn: 'root',
 })
