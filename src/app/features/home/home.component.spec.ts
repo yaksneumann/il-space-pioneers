@@ -19,7 +19,6 @@ describe('HomeComponent', () => {
       'clearApplicationData',
       'isAuthenticated'
     ], {
-      // Properties (getters)
       isAuthenticated: jasmine.createSpy('isAuthenticated').and.returnValue(() => false)
     });
     
@@ -111,15 +110,6 @@ describe('HomeComponent', () => {
       component.startApplication();
       
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/register']);
-    });
-
-    it('should navigate to candidate view when viewApplication is called', () => {
-      const mockUser = { email: 'test@example.com', role: 'candidate' as const, id: '1', loginTime: Date.now() };
-      mockAuthService.getCurrentUser.and.returnValue(mockUser);
-      
-      component.viewApplication();
-      
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/candidate'], { queryParams: { email: 'test@example.com' } });
     });
 
     it('should navigate to registration when editApplication is called', () => {

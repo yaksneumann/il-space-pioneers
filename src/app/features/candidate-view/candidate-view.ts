@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { SupabaseService } from '../../core/services/supabase.service';
+// import { SupabaseService } from '../../core/services/supabase.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Candidate } from '../../core/models/candidate.model';
 
@@ -14,11 +14,12 @@ import { Candidate } from '../../core/models/candidate.model';
 export class CandidateViewComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly supabaseService = inject(SupabaseService);
+  // private readonly supabaseService = inject(SupabaseService);
   private readonly authService = inject(AuthService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly EDIT_DEADLINE_DAYS = 3;
   private readonly MS_PER_DAY = 24 * 60 * 60 * 1000;
+  private readonly LOCAL_STORAGE_KEY = 'mockCandidates';
 
   candidate: Candidate | null = null;
   isLoading = true;
@@ -46,7 +47,7 @@ export class CandidateViewComponent implements OnInit {
     this.error = null;
 
     try {
-      this.allCandidates = await this.supabaseService.getAllCandidates();
+      this.allCandidates = this.loadCandidatesFromLocalStorage();
       this.currentIndex = this.allCandidates.findIndex(c => c.email === email);
       
       if (this.currentIndex >= 0) {
@@ -125,5 +126,22 @@ export class CandidateViewComponent implements OnInit {
 
   goToDashboard(): void {
     this.router.navigate(['/dashboard']);
+  }
+
+  private loadCandidatesFromLocalStorage(): Candidate[] {
+    try {
+      const raw = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as Candidate[];
+      
+      return parsed.map(candidate => ({
+        ...candidate,
+        createdAt: candidate.createdAt ? new Date(candidate.createdAt) : undefined,
+        updatedAt: candidate.updatedAt ? new Date(candidate.updatedAt) : undefined
+      }));
+    } catch (e) {
+      console.warn('Failed to load candidates from localStorage', e);
+      return [];
+    }
   }
 }

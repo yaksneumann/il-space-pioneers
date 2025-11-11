@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { SupabaseService } from '../../core/services/supabase.service';
+// import { SupabaseService } from '../../core/services/supabase.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Candidate, CandidateFormData } from '../../core/models/candidate.model';
 
@@ -15,8 +15,9 @@ export class RegistrationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly supabaseService = inject(SupabaseService);
+  // private readonly supabaseService = inject(SupabaseService);
   private readonly authService = inject(AuthService);
+  private readonly LOCAL_STORAGE_KEY = 'mockCandidates';
 
   private static readonly MAX_IMAGE_SIZE = 5 * 1024 * 1024;
   private static readonly MAX_RESUME_SIZE = 10 * 1024 * 1024;
@@ -87,7 +88,7 @@ export class RegistrationComponent implements OnInit {
     
     if (queryEmail) {
       try {
-        const candidate = await this.supabaseService.getCandidateByEmail(queryEmail);
+        const candidate = this.getCandidateByEmailFromLocalStorage(queryEmail);
         
         if (candidate) {
           this.isEditMode = true;
@@ -123,7 +124,7 @@ export class RegistrationComponent implements OnInit {
       this.editTimeRemaining = this.authService.getEditTimeRemaining();
       
       try {
-        const candidate = await this.supabaseService.getCandidateByEmail(token.email);
+        const candidate = this.getCandidateByEmailFromLocalStorage(token.email);
         if (candidate) {
           this.populateFormWithCandidateData(candidate);
         }
@@ -143,7 +144,7 @@ export class RegistrationComponent implements OnInit {
         
         if (appStatus.canEdit) {
           try {
-            const candidate = await this.supabaseService.getCandidateByEmail(currentUser.email);
+            const candidate = this.getCandidateByEmailFromLocalStorage(currentUser.email);
             if (candidate) {
               this.populateFormWithCandidateData(candidate);
             }
@@ -333,7 +334,7 @@ export class RegistrationComponent implements OnInit {
         resume: this.selectedResume
       };
 
-      const result = await this.supabaseService.submitCandidate(formData);
+      const result = this.submitCandidateToLocalStorage(formData);
 
       if (result) {
         this.isSubmitted = true;
@@ -395,6 +396,66 @@ export class RegistrationComponent implements OnInit {
       }
     } catch (error) {
       console.warn('Error removing candidate from localStorage:', error);
+    }
+  }
+
+  private getCandidateByEmailFromLocalStorage(email: string): Candidate | null {
+    try {
+      const stored = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!stored) return null;
+      
+      const candidates: Candidate[] = JSON.parse(stored);
+      const found = candidates.find(c => c.email === email);
+      
+      if (found) {
+        return {
+          ...found,
+          createdAt: found.createdAt ? new Date(found.createdAt) : undefined,
+          updatedAt: found.updatedAt ? new Date(found.updatedAt) : undefined
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.warn('Error loading candidate from localStorage:', error);
+      return null;
+    }
+  }
+
+  private submitCandidateToLocalStorage(formData: CandidateFormData): Candidate {
+    const newCandidate: Candidate = {
+      id: 'submitted-' + Date.now(),
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      age: formData.age,
+      city: formData.city,
+      hobbies: formData.hobbies,
+      motivation: formData.motivation,
+      profileImage: formData.profileImage ? {
+        filename: formData.profileImage.name,
+        url: 'mock-url-' + Date.now()
+      } : undefined,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      canEdit: true
+    };
+    
+    try {
+      const stored = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      const existingCandidates: Candidate[] = stored ? JSON.parse(stored) : [];
+      
+      const filteredCandidates = existingCandidates.filter(c => c.email !== newCandidate.email);
+      
+      const updatedCandidates = [newCandidate, ...filteredCandidates];
+      
+      localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(updatedCandidates));
+      
+      return newCandidate;
+    } catch (error) {
+      console.error('Error saving candidate to localStorage:', error);
+      throw error;
     }
   }
 }
