@@ -74,8 +74,6 @@ For recruiter dashboard access, use the following credentials:
 
 - **Email**: `evgeny@space-pioneers.com`
 - **Password**: `space2025`
-
-Navigate to `/recruiter-login` to access the recruiter dashboard and manage candidate applications.
    
 ## 🏗️ Project Structure
 
