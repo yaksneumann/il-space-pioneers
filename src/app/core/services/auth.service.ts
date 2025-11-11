@@ -23,6 +23,11 @@ export interface CandidateApplication {
   daysLeft: number;
 }
 
+export interface CandidateData {
+  email: string;
+  [key: string]: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,13 +36,16 @@ export class AuthService {
   private readonly USER_KEY = 'il_space_pioneers_user';
   private readonly APPLICATION_KEY = 'il_space_pioneers_application';
   private readonly TOKEN_DURATION_DAYS = 3;
+  private readonly MS_PER_DAY = 24 * 60 * 60 * 1000;
+  private readonly MS_PER_HOUR = 60 * 60 * 1000;
+  private readonly MS_PER_MINUTE = 60 * 1000;
 
   private router = inject(Router);
   private currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
   
   currentUser$ = this.currentUserSubject.asObservable();
   isAuthenticated = signal(false);
-  userRole = signal<'recruiter' | 'candidate' | null>(null);
+  private userRole = signal<'recruiter' | 'candidate' | null>(null);
 
   constructor() {
     this.loadUserFromStorage();
@@ -118,7 +126,7 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  saveApplication(candidateData: any): void {
+  saveApplication(candidateData: CandidateData): void {
     try {
       const applicationData: CandidateApplication = {
         email: candidateData.email,
@@ -145,7 +153,7 @@ export class AuthService {
         return null;
       }
 
-      const daysPassed = Math.floor((Date.now() - application.submissionDate) / (1000 * 60 * 60 * 24));
+      const daysPassed = Math.floor((Date.now() - application.submissionDate) / this.MS_PER_DAY);
       const daysLeft = Math.max(0, this.TOKEN_DURATION_DAYS - daysPassed);
       
       return {
@@ -172,7 +180,7 @@ export class AuthService {
       candidateId,
       email,
       createdAt: new Date(),
-      expiresAt: new Date(Date.now() + this.TOKEN_DURATION_DAYS * 24 * 60 * 60 * 1000)
+      expiresAt: new Date(Date.now() + this.TOKEN_DURATION_DAYS * this.MS_PER_DAY)
     };
 
     const tokenString = btoa(JSON.stringify(token));
@@ -221,9 +229,9 @@ export class AuthService {
 
     if (diffMs <= 0) return 'Expired';
 
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const days = Math.floor(diffMs / this.MS_PER_DAY);
+    const hours = Math.floor((diffMs % this.MS_PER_DAY) / this.MS_PER_HOUR);
+    const minutes = Math.floor((diffMs % this.MS_PER_HOUR) / this.MS_PER_MINUTE);
 
     if (days > 0) {
       return `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''}`;

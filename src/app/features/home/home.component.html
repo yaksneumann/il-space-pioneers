@@ -29,21 +29,13 @@
                     <span class="btn-icon">✏️</span>
                     Edit Application
                   </button>
-                  <button (click)="viewApplication()" class="cosmic-button secondary">
-                    <span class="btn-icon">👁️</span>
-                    View Details
-                  </button>
                 </div>
               } @else {
                 <p class="cosmic-body">
                   Your edit period has expired. You can view your application or submit a new one.
                 </p>
                 <div class="status-actions">
-                  <button (click)="viewApplication()" class="cosmic-button">
-                    <span class="btn-icon">👁️</span>
-                    View Application
-                  </button>
-                  <button (click)="newApplication()" class="cosmic-button secondary">
+                  <button (click)="newApplication()" class="cosmic-button">
                     <span class="btn-icon">📝</span>
                     New Application
                   </button>

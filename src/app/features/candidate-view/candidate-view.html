@@ -21,11 +21,8 @@
             <h2 class="subtitle">Application Not Found</h2>
             <p class="body-text">{{ error }}</p>
             <div class="error-actions">
-              <button (click)="newApplication()" class="cosmic-button">
-                Submit New Application
-              </button>
               <button (click)="goToDashboard()" class="cosmic-button secondary">
-                View Dashboard
+                Back to Dashboard
               </button>
             </div>
           </div>
@@ -39,6 +36,11 @@
       <div class="application-header">
         <div class="header-content">
           <h1 class="title">Mission Application</h1>
+          @if (allCandidates.length > 0) {
+            <div class="application-position">
+              <span class="position-text">Application {{ getCurrentPosition() }}</span>
+            </div>
+          }
           <div class="application-status">
             @if (canEdit) {
               <div class="edit-status editable">
@@ -54,62 +56,69 @@
           </div>
         </div>
         
-        @if (canEdit) {
-          <div class="header-actions">
-            <button (click)="editApplication()" class="cosmic-button">
-              Edit Application
-            </button>
-          </div>
-        }
       </div>
         <div class="application-content">
           
-          <div class="info-card cosmic-card">
-            <div class="card-header">
-              <h3 class="subtitle">Personal Information</h3>
-            </div>
-            <div class="card-content">
-              <div class="info-grid">
-                <div class="info-item">
-                  <label class="info-label">First Name</label>
-                  <span class="info-value">{{ candidate.firstName }}</span>
-                </div>
-                <div class="info-item">
-                  <label class="info-label">Last Name</label>
-                  <span class="info-value">{{ candidate.lastName }}</span>
-                </div>
-                <div class="info-item">
-                  <label class="info-label">Email</label>
-                  <span class="info-value">{{ candidate.email }}</span>
-                </div>
-                <div class="info-item">
-                  <label class="info-label">Phone</label>
-                  <span class="info-value">{{ candidate.phoneNumber }}</span>
-                </div>
-                <div class="info-item">
-                  <label class="info-label">Age</label>
-                  <span class="info-value">{{ candidate.age }} years</span>
-                </div>
-                <div class="info-item">
-                  <label class="info-label">City</label>
-                  <span class="info-value">{{ candidate.city }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          @if (candidate.profileImage?.url) {
-            <div class="image-card cosmic-card">
+          <div class="personal-section">
+            <div class="info-card cosmic-card">
               <div class="card-header">
-                <h3 class="subtitle">Profile Image</h3>
+                <h3 class="subtitle">Personal Information</h3>
               </div>
               <div class="card-content">
-                <div class="image-container">
-                  <img [src]="candidate.profileImage?.url" [alt]="candidate.firstName + ' ' + candidate.lastName" class="profile-image">
+                <div class="info-grid">
+                  <div class="info-item">
+                    <label class="info-label">First Name</label>
+                    <span class="info-value">{{ candidate.firstName }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label class="info-label">Last Name</label>
+                    <span class="info-value">{{ candidate.lastName }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label class="info-label">Email</label>
+                    <span class="info-value">{{ candidate.email }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label class="info-label">Phone</label>
+                    <span class="info-value">{{ candidate.phoneNumber }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label class="info-label">Age</label>
+                    <span class="info-value">{{ candidate.age }} years</span>
+                  </div>
+                  <div class="info-item">
+                    <label class="info-label">City</label>
+                    <span class="info-value">{{ candidate.city }}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          }
+
+            @if (candidate.profileImage?.url) {
+              <div class="image-card cosmic-card">
+                <div class="card-header">
+                  <h3 class="subtitle">Candidate Photo</h3>
+                </div>
+                <div class="card-content">
+                  <div class="image-container">
+                    <img [src]="candidate.profileImage?.url" [alt]="candidate.firstName + ' ' + candidate.lastName" class="profile-image">
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="image-placeholder cosmic-card">
+                <div class="card-header">
+                  <h3 class="subtitle">Candidate Photo</h3>
+                </div>
+                <div class="card-content">
+                  <div class="placeholder-content">
+                    <div class="placeholder-icon">👤</div>
+                    <p class="placeholder-text">No photo provided</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
 
           <div class="details-card cosmic-card">
             <div class="card-header">
@@ -155,20 +164,36 @@
         </div>
 
         <div class="action-section">
-          <div class="action-buttons">
-            @if (canEdit) {
-              <button (click)="editApplication()" class="cosmic-button primary">
-                <span class="btn-icon">✏️</span>
-                Edit Application
-              </button>
+          <div class="navigation-section">
+            @if (allCandidates.length > 1) {
+              <div class="navigation-controls">
+                <button 
+                  (click)="goToPrevious()" 
+                  [disabled]="!hasPrevious()"
+                  class="cosmic-button secondary navigation-btn">
+                  <span class="btn-icon">⬅️</span>
+                  Previous
+                </button>
+                
+                <div class="position-indicator">
+                  <span class="position-text">{{ getCurrentPosition() }}</span>
+                </div>
+                
+                <button 
+                  (click)="goToNext()" 
+                  [disabled]="!hasNext()"
+                  class="cosmic-button secondary navigation-btn">
+                  <span class="btn-icon">➡️</span>
+                  Next
+                </button>
+              </div>
             }
-            <button (click)="newApplication()" class="cosmic-button secondary">
-              <span class="btn-icon">📝</span>
-              New Application
-            </button>
+          </div>
+          
+          <div class="action-buttons">
             <button (click)="goToDashboard()" class="cosmic-button tertiary">
               <span class="btn-icon">📊</span>
-              View Dashboard
+              Back to Dashboard
             </button>
           </div>
         </div>

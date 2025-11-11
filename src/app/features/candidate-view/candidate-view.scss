@@ -107,6 +107,20 @@
         font-size: $font-size-subtitle;
       }
     }
+    
+    .application-position {
+      margin-bottom: 1rem;
+      
+      .position-text {
+        font-size: $font-size-small;
+        color: $primary-color;
+        font-weight: 600;
+        background: rgba(74, 144, 226, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        border: 1px solid rgba(74, 144, 226, 0.2);
+      }
+    }
   }
   
   .application-status {
@@ -142,28 +156,42 @@
   display: grid;
   gap: 2rem;
   
-  @media (min-width: 1024px) {
-    grid-template-columns: 2fr 1fr;
+  .personal-section {
+    display: grid;
+    gap: 2rem;
+    
+    @media (min-width: 768px) {
+      grid-template-columns: 2fr 1fr;
+      align-items: stretch;
+    }
     
     .info-card {
-      grid-column: 1 / -1;
+      @media (min-width: 768px) {
+        grid-column: 1;
+      }
     }
     
-    .image-card {
-      grid-row: 2 / 4;
-    }
-    
-    .details-card {
-      grid-column: 1;
-    }
-    
-    .metadata-card {
-      grid-column: 1;
+    .image-card, .image-placeholder {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      
+      @media (min-width: 768px) {
+        grid-column: 2;
+        grid-row: 1;
+      }
+      
+      .card-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
 }
 
-.info-card, .image-card, .details-card, .metadata-card {
+.info-card, .image-card, .image-placeholder, .details-card, .metadata-card {
   .card-header {
     padding: 1.5rem 1.5rem 0;
     border-bottom: 1px solid $border-accent;
@@ -209,14 +237,54 @@
 
 .image-container {
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
   
   .profile-image {
-    max-width: 100%;
-    max-height: 300px;
+    max-width: 90%;
+    max-height: 90%;
+    width: auto;
+    height: auto;
+    min-height: 150px;
+    min-width: 150px;
     border-radius: 12px;
-    border: 2px solid $border-accent;
+    border: 3px solid $border-accent;
     object-fit: cover;
     box-shadow: $shadow-card;
+    transition: transform 0.3s ease;
+    
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+}
+
+.image-placeholder {
+  .placeholder-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    
+    .placeholder-icon {
+      font-size: 4rem;
+      color: $border-color;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+    
+    .placeholder-text {
+      color: $text-secondary;
+      font-style: italic;
+      margin: 0;
+    }
   }
 }
 
@@ -283,6 +351,72 @@
   margin-top: 3rem;
   padding-top: 2rem;
   border-top: 1px solid $border-accent;
+  
+  .navigation-section {
+    margin-bottom: 2rem;
+    
+    .navigation-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      padding: 1.5rem;
+      background: $card-bg;
+      border: 1px solid $border-accent;
+      border-radius: 12px;
+      
+      @media (max-width: $breakpoint-mobile) {
+        gap: 1rem;
+        padding: 1rem;
+      }
+      
+      .navigation-btn {
+        min-width: 120px;
+        
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          background: $card-bg-hover;
+          color: $text-secondary;
+          border-color: $border-color;
+          
+          &:hover {
+            background: $card-bg-hover;
+            border-color: $border-color;
+            transform: none;
+          }
+        }
+        
+        .btn-icon {
+          margin-right: 0.5rem;
+        }
+        
+        @media (max-width: $breakpoint-mobile) {
+          min-width: 100px;
+          font-size: $font-size-small;
+          padding: 0.75rem 1rem;
+        }
+      }
+      
+      .position-indicator {
+        .position-text {
+          font-size: $font-size-body;
+          font-weight: 600;
+          color: $primary-color;
+          background: rgba(74, 144, 226, 0.1);
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
+          border: 1px solid rgba(74, 144, 226, 0.2);
+          white-space: nowrap;
+          
+          @media (max-width: $breakpoint-mobile) {
+            font-size: $font-size-small;
+            padding: 0.5rem 1rem;
+          }
+        }
+      }
+    }
+  }
   
   .action-buttons {
     display: flex;

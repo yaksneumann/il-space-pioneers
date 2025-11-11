@@ -1,42 +1,130 @@
 $primary-color: #4a90e2;
+
 $primary-gradient: linear-gradient(45deg, #4a90e2, #74b9ff);
+
 $background-gradient: linear-gradient(135deg, #0a0a23 0%, #1a1a3a 50%, #2a2a4a 100%);
 
+
+
 $text-primary: #ffffff;
+
 $text-secondary: rgba(255, 255, 255, 0.9);
+
 $text-muted: rgba(255, 255, 255, 0.7);
+
 $text-subtle: rgba(255, 255, 255, 0.6);
 
+$primary-color: #4a90e2;$text-primary: #ffffff;
+
 $card-bg: rgba(255, 255, 255, 0.05);
-$card-bg-hover: rgba(255, 255, 255, 0.08);
+
+$card-bg-hover: rgba(255, 255, 255, 0.08);$primary-gradient: linear-gradient(45deg, #4a90e2, #74b9ff);$text-secondary: rgba(255, 255, 255, 0.9);
+
 $section-bg: rgba(255, 255, 255, 0.02);
-$footer-bg: rgba(0, 0, 0, 0.3);
 
-$border-color: rgba(74, 144, 226, 0.3);
+$footer-bg: rgba(0, 0, 0, 0.3);$background-gradient: linear-gradient(135deg, #0a0a23 0%, #1a1a3a 50%, #2a2a4a 100%);$text-muted: rgba(255, 255, 255, 0.7);
+
+
+
+$border-color: rgba(74, 144, 226, 0.3);$text-subtle: rgba(255, 255, 255, 0.6);
+
 $border-accent: rgba(74, 144, 226, 0.2);
-$border-hover: $primary-color;
 
-$error-color: rgba(255, 107, 107, 0.8);
+$border-hover: $primary-color;$text-primary: #ffffff;
+
+
+
+$error-color: rgba(255, 107, 107, 0.8);$text-secondary: rgba(255, 255, 255, 0.9);$card-bg: rgba(255, 255, 255, 0.05);
+
 $success-color: #00e676;
-$focus-shadow: rgba(74, 144, 226, 0.2);
 
-$shadow-card: 0 4px 12px rgba(74, 144, 226, 0.3);
+$focus-shadow: rgba(74, 144, 226, 0.2);$text-muted: rgba(255, 255, 255, 0.7);$card-bg-hover: rgba(255, 255, 255, 0.08);
+
+
+
+$shadow-card: 0 4px 12px rgba(74, 144, 226, 0.3);$text-subtle: rgba(255, 255, 255, 0.6);$section-bg: rgba(255, 255, 255, 0.02);
+
 $shadow-hover: 0 8px 25px rgba(74, 144, 226, 0.4);
-$shadow-focus: 0 0 0 2px $focus-shadow;
 
-$transition-base: all 0.3s ease;
+$shadow-focus: 0 0 0 2px $focus-shadow;$footer-bg: rgba(0, 0, 0, 0.3);
+
+
+
+$transition-base: all 0.3s ease;$card-bg: rgba(255, 255, 255, 0.05);
+
 $transition-transform: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+$card-bg-hover: rgba(255, 255, 255, 0.08);$border-color: rgba(74, 144, 226, 0.3);
+
 $section-padding: 6rem 0;
-$section-padding-mobile: 4rem 0;
+
+$section-padding-mobile: 4rem 0;$section-bg: rgba(255, 255, 255, 0.02);$border-accent: rgba(74, 144, 226, 0.2);
+
 $card-padding: 2.5rem;
-$card-padding-mobile: 2rem;
+
+$card-padding-mobile: 2rem;$footer-bg: rgba(0, 0, 0, 0.3);$border-hover: $primary-color;
+
+
 
 $font-size-hero: 3.5rem;
+
 $font-size-title: 2.5rem;
-$font-size-subtitle: 1.25rem;
+
+$font-size-subtitle: 1.25rem;$border-color: rgba(74, 144, 226, 0.3);$error-color: rgba(255, 107, 107, 0.8);
+
 $font-size-body: 1rem;
-$font-size-small: 0.9rem;
+
+$font-size-small: 0.9rem;$border-accent: rgba(74, 144, 226, 0.2);$success-color: #00e676;
+
+
+
+$breakpoint-mobile: 768px;$border-hover: $primary-color;$focus-shadow: rgba(74, 144, 226, 0.2);
+
+$breakpoint-tablet: 968px;
+
+$breakpoint-small: 480px;
+
+$error-color: rgba(255, 107, 107, 0.8);$shadow-card: 0 4px 12px rgba(74, 144, 226, 0.3);
+
+$success-color: #00e676;$shadow-hover: 0 8px 25px rgba(74, 144, 226, 0.4);
+
+$focus-shadow: rgba(74, 144, 226, 0.2);$shadow-focus: 0 0 0 2px $focus-shadow;
+
+
+
+$shadow-card: 0 4px 12px rgba(74, 144, 226, 0.3);$transition-base: all 0.3s ease;
+
+$shadow-hover: 0 8px 25px rgba(74, 144, 226, 0.4);$transition-transform: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+$shadow-focus: 0 0 0 2px $focus-shadow;
+
+$section-padding: 6rem 0;
+
+$transition-base: all 0.3s ease;$section-padding-mobile: 4rem 0;
+
+$transition-transform: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);$card-padding: 2.5rem;
+
+$card-padding-mobile: 2rem;
+
+$section-padding: 6rem 0;
+
+$section-padding-mobile: 4rem 0;$font-size-hero: 3.5rem;
+
+$card-padding: 2.5rem;$font-size-title: 2.5rem;
+
+$card-padding-mobile: 2rem;$font-size-subtitle: 1.25rem;
+
+$font-size-body: 1rem;
+
+$font-size-hero: 3.5rem;$font-size-small: 0.9rem;
+
+$font-size-title: 2.5rem;
+
+$font-size-subtitle: 1.25rem;$breakpoint-mobile: 768px;
+
+$font-size-body: 1rem;$breakpoint-tablet: 968px;
+
+$font-size-small: 0.9rem;$breakpoint-small: 480px;
 
 $breakpoint-mobile: 768px;
 $breakpoint-tablet: 968px;

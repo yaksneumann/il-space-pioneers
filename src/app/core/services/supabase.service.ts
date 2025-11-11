@@ -123,6 +123,15 @@ export class SupabaseService {
 
     return mockCandidatesData.map((data, index) => {
       const submissionDate = new Date(baseDate - data.daysAgo * this.MS_PER_DAY);
+      
+      const profileImages = [
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+        null,
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
+      ];
+      
       return {
         id: `mock-${index + 1}`,
         firstName: data.firstName,
@@ -133,6 +142,10 @@ export class SupabaseService {
         city: data.city,
         hobbies: data.hobbies,
         motivation: data.motivation,
+        profileImage: profileImages[index] ? {
+          filename: `profile_${index + 1}.jpg`,
+          url: profileImages[index]
+        } : undefined,
         createdAt: submissionDate,
         updatedAt: submissionDate,
         canEdit: data.daysAgo <= this.EDIT_DEADLINE_DAYS

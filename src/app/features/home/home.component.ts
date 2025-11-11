@@ -1,7 +1,6 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { SupabaseService } from '../../core/services/supabase.service';
 
 interface ApplicationStatus {
   canEdit: boolean;
@@ -21,7 +20,6 @@ export class HomeComponent implements OnInit {
   
   private authService = inject(AuthService);
   private router = inject(Router);
-  private supabaseService = inject(SupabaseService);
 
   ngOnInit(): void {
     this.scrollToTop();
@@ -77,18 +75,6 @@ export class HomeComponent implements OnInit {
       this.router.navigate(['/register'], { queryParams: { email: email } });
     } else {
       this.router.navigate(['/register']);
-    }
-  }
-
-  viewApplication(): void {
-    const email = this.candidateEmail();
-    if (email) {
-      this.router.navigate(['/candidate'], { queryParams: { email: email } });
-    } else {
-      const user = this.authService.getCurrentUser();
-      if (user?.email) {
-        this.router.navigate(['/candidate'], { queryParams: { email: user.email } });
-      }
     }
   }
 
