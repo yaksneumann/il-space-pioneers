@@ -67,6 +67,15 @@ The Israeli Imaginary Space Agency is seeking pioneering candidates for our inau
    ```bash
    ng serve -o
    ```
+
+## 🔑 Recruiter Access
+
+For recruiter dashboard access, use the following credentials:
+
+- **Email**: `evgeny@space-pioneers.com`
+- **Password**: `space2025`
+
+Navigate to `/recruiter-login` to access the recruiter dashboard and manage candidate applications.
    
 ## 🏗️ Project Structure
 
