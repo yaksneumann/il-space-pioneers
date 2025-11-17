@@ -87,8 +87,8 @@ src/
 │   │   ├── registration/        # Application submission
 │   │   ├── candidate-view/      # Application viewing
 │   │   └── dashboard/           # Recruiter dashboard
-│   ├── shared/                  # Shared components
-│   │   └── components/          # Reusable UI components
+│   ├── shared/                  # Shared utilities
+│   │   └── _variables.scss      # Global SCSS variables
 │   └── environments/            # Environment configurations
 ├── assets/                      # Static assets
 └── styles/                      # Global styles and themes
