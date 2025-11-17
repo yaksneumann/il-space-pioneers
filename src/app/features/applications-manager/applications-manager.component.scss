@@ -1,0 +1,469 @@
+@use '../../shared/variables' as *;
+
+.applications-manager {
+  min-height: 100vh;
+  background: $background-gradient;
+  padding: $section-padding-mobile;
+  
+  @media (min-width: $breakpoint-mobile) {
+    padding: $section-padding;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    
+    @media (min-width: $breakpoint-mobile) {
+      padding: 0 2rem;
+    }
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+    
+    h1 {
+      font-size: $font-size-title;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: $text-primary;
+      
+      @media (min-width: $breakpoint-mobile) {
+        font-size: $font-size-hero;
+      }
+    }
+
+    .subtitle {
+      font-size: $font-size-subtitle;
+      color: $text-secondary;
+      margin: 0;
+      line-height: 1.6;
+    }
+  }
+
+  .email-section {
+    background: $card-bg;
+    border: 1px solid $border-accent;
+    border-radius: 12px;
+    padding: $card-padding-mobile;
+    margin-bottom: 2rem;
+    box-shadow: $shadow-card;
+    
+    @media (min-width: $breakpoint-mobile) {
+      padding: $card-padding;
+    }
+
+    h2 {
+      color: $text-primary;
+      margin-bottom: 1.5rem;
+      font-size: $font-size-subtitle;
+      font-weight: 600;
+    }
+
+    .email-input-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      
+      @media (max-width: $breakpoint-small) {
+        flex-direction: column;
+      }
+
+      .email-input {
+        flex: 1;
+        min-width: 280px;
+        padding: 1rem;
+        background: $card-bg-hover;
+        border: 1px solid $border-accent;
+        border-radius: 8px;
+        color: $text-primary;
+        font-family: 'Exo 2', sans-serif;
+        font-size: $font-size-body;
+        transition: $transition-base;
+        
+        @media (max-width: $breakpoint-small) {
+          min-width: 100%;
+        }
+
+        &::placeholder {
+          color: $text-subtle;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: $shadow-focus;
+          background: $card-bg;
+        }
+
+        &.error {
+          border-color: $error-color;
+          box-shadow: 0 0 0 1px rgba(255, 107, 107, 0.3);
+        }
+      }
+
+      .load-btn {
+        padding: 1rem 1.5rem;
+        background: $primary-gradient;
+        color: $text-primary;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition-transform;
+        white-space: nowrap;
+        font-family: 'Exo 2', sans-serif;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: $shadow-hover;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          transform: none;
+        }
+      }
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: $error-color;
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: rgba(255, 107, 107, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      font-size: $font-size-small;
+
+      .error-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .create-section {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    .create-new-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: $primary-gradient;
+      color: $text-primary;
+      border: none;
+      border-radius: 8px;
+      font-size: $font-size-body;
+      font-weight: 600;
+      cursor: pointer;
+      transition: $transition-transform;
+      font-family: 'Exo 2', sans-serif;
+
+      .plus-icon {
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: $shadow-hover;
+      }
+    }
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 3px solid $border-accent;
+      border-top: 3px solid $primary-color;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    p {
+      font-size: $font-size-body;
+      color: $text-secondary;
+      margin: 0;
+    }
+  }
+
+  .no-applications {
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: $card-bg;
+      border: 1px solid $border-accent;
+      border-radius: 12px;
+      box-shadow: $shadow-card;
+
+      .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        display: block;
+      }
+
+      h3 {
+        font-size: $font-size-subtitle;
+        margin-bottom: 1rem;
+        color: $primary-color;
+        font-weight: 600;
+      }
+
+      p {
+        font-size: $font-size-body;
+        margin-bottom: 2rem;
+        color: $text-secondary;
+        line-height: 1.6;
+      }
+
+      .create-first-btn {
+        padding: 1rem 2rem;
+        background: $primary-gradient;
+        color: $text-primary;
+        border: none;
+        border-radius: 8px;
+        font-size: $font-size-body;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition-transform;
+        font-family: 'Exo 2', sans-serif;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: $shadow-hover;
+        }
+      }
+    }
+  }
+
+  .duplicate-warning {
+    margin-bottom: 2rem;
+
+    .warning-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      border-radius: 8px;
+      color: #FFC107;
+
+      .warning-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+
+      p {
+        margin: 0;
+        font-weight: 500;
+        font-size: $font-size-small;
+      }
+    }
+  }
+
+  .applications-list {
+    h2 {
+      color: $text-primary;
+      margin-bottom: 2rem;
+      font-size: $font-size-subtitle;
+      font-weight: 600;
+    }
+
+    .applications-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+      
+      @media (max-width: $breakpoint-small) {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .application-card {
+        background: $card-bg;
+        border: 1px solid $border-accent;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: $transition-base;
+        box-shadow: $shadow-card;
+
+        &:hover {
+          background: $card-bg-hover;
+          border-color: $primary-color;
+          transform: translateY(-2px);
+          box-shadow: $shadow-hover;
+        }
+
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid $border-accent;
+
+          h3 {
+            margin: 0;
+            font-size: 1.125rem;
+            color: $text-primary;
+            font-weight: 600;
+          }
+
+          .age-badge {
+            background: rgba(74, 144, 226, 0.1);
+            color: $primary-color;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: $font-size-small;
+            font-weight: 500;
+            border: 1px solid $border-accent;
+          }
+        }
+
+        .card-content {
+          margin-bottom: 1.5rem;
+
+          .info-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .label {
+              font-weight: 600;
+              min-width: 70px;
+              color: $text-secondary;
+              font-size: $font-size-small;
+            }
+
+            .value {
+              flex: 1;
+              color: $text-primary;
+              font-size: $font-size-small;
+
+              &.motivation {
+                font-style: italic;
+                color: $text-muted;
+                line-height: 1.4;
+              }
+            }
+          }
+        }
+
+        .card-actions {
+          display: flex;
+          gap: 0.75rem;
+
+          button {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: $font-size-small;
+            font-weight: 600;
+            cursor: pointer;
+            transition: $transition-base;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: 'Exo 2', sans-serif;
+
+            &.view-btn {
+              background: $card-bg-hover;
+              color: $text-secondary;
+              border: 1px solid $border-accent;
+
+              &:hover {
+                background: $card-bg;
+                border-color: $primary-color;
+                color: $primary-color;
+                transform: translateY(-1px);
+              }
+            }
+
+            &.delete-btn {
+              background: rgba(255, 107, 107, 0.1);
+              color: $error-color;
+              border: 1px solid rgba(255, 107, 107, 0.3);
+
+              &:hover {
+                background: rgba(255, 107, 107, 0.2);
+                border-color: $error-color;
+                transform: translateY(-1px);
+              }
+            }
+          }
+        }
+
+        .edit-warning {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-top: 1rem;
+          padding: 0.75rem;
+          background: rgba(255, 193, 7, 0.1);
+          border: 1px solid rgba(255, 193, 7, 0.3);
+          border-radius: 8px;
+
+          .warning-icon {
+            color: #FFC107;
+            font-size: 1rem;
+            flex-shrink: 0;
+          }
+
+          small {
+            color: #FFC107;
+            font-size: 0.75rem;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: $breakpoint-small) {
+  .applications-manager {
+    .container {
+      padding: 0 0.5rem;
+    }
+    
+    .email-section,
+    .no-applications .empty-state,
+    .applications-list .applications-grid .application-card {
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+    }
+    
+    .applications-list .applications-grid .application-card {
+      .card-actions {
+        flex-direction: column;
+        
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

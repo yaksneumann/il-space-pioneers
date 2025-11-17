@@ -1,0 +1,142 @@
+<div class="applications-manager">
+  <div class="container">
+    <div class="header">
+      <h1>My Space Mission Applications</h1>
+      <p class="subtitle">Manage all your applications to join the space pioneers program</p>
+    </div>
+
+    <div class="email-section">
+      <h2>Filter Applications</h2>
+      <div class="email-input-group">
+        <input 
+          type="email" 
+          [(ngModel)]="userEmail" 
+          (input)="onEmailChange()"
+          placeholder="Enter email to filter applications (leave empty to see all)"
+          class="email-input"
+          [class.error]="emailError">
+        <button 
+          type="button" 
+          (click)="userEmail ? loadApplicationsByEmail(userEmail) : loadAllApplications()"
+          class="load-btn"
+          [disabled]="isLoading">
+          {{ isLoading ? 'Loading...' : (userEmail ? 'Filter by Email' : 'Show All Applications') }}
+        </button>
+      </div>
+      @if (emailError) {
+        <div class="error-message">
+          <i class="error-icon">⚠️</i>
+          {{ emailError }}
+        </div>
+      }
+    </div>
+
+    @if (userEmail && !emailError) {
+      <div class="create-section">
+        <button 
+          type="button" 
+          (click)="createNewApplication()"
+          class="create-new-btn">
+          <i class="plus-icon">+</i>
+          Create New Application
+        </button>
+      </div>
+    }
+
+    @if (isLoading) {
+      <div class="loading-state">
+        <div class="loader"></div>
+        <p>Loading applications...</p>
+      </div>
+    }
+
+    @if (!isLoading && applications.length === 0) {
+      <div class="no-applications">
+        <div class="empty-state">
+          <div class="empty-icon">🚀</div>
+          <h3>{{ userEmail ? 'No Applications Found' : 'No Applications Yet' }}</h3>
+          <p>{{ userEmail ? 'No applications found for this email address.' : 'No applications have been submitted yet. Be the first to apply!' }}</p>
+          @if (userEmail) {
+            <button 
+              type="button" 
+              (click)="createNewApplication()"
+              class="create-first-btn">
+              Submit Your First Application
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (applications.length > 0 && getDuplicateInfo(applications)) {
+      <div class="duplicate-warning">
+        <div class="warning-content">
+          <i class="warning-icon">⚠️</i>
+          <p>{{ getDuplicateInfo(applications) }}</p>
+        </div>
+      </div>
+    }
+
+    @if (!isLoading && applications.length > 0) {
+      <div class="applications-list">
+        <h2>{{ userEmail ? 'Applications for ' + userEmail : 'All Applications' }} ({{ applications.length }})</h2>
+        
+        <div class="applications-grid">
+          @for (application of applications; track application.id) {
+            <div class="application-card">
+              <div class="card-header">
+                <h3>{{ application.firstName }} {{ application.lastName }}</h3>
+                <span class="age-badge">{{ getApplicationAge(application) }}</span>
+              </div>
+              
+              <div class="card-content">
+                <div class="info-row">
+                  <span class="label">Email:</span>
+                  <span class="value">{{ application.email }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Phone:</span>
+                  <span class="value">{{ application.phoneNumber }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Age:</span>
+                  <span class="value">{{ application.age }} years</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">City:</span>
+                  <span class="value">{{ application.city }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Motivation:</span>
+                  <span class="value motivation">{{ truncateText(application.motivation, 100) }}</span>
+                </div>
+              </div>
+              
+              <div class="card-actions">
+                <button 
+                  type="button" 
+                  (click)="viewApplication(application)"
+                  class="view-btn">
+                  👁️ {{ canEditApplication(application) ? 'Edit' : 'View' }}
+                </button>
+                <button 
+                  type="button" 
+                  (click)="deleteApplication(application)"
+                  class="delete-btn">
+                  🗑️ Delete
+                </button>
+              </div>
+              
+              @if (!canEditApplication(application)) {
+                <div class="edit-warning">
+                  <i class="warning-icon">⏰</i>
+                  <small>Editing period expired (3 days limit)</small>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

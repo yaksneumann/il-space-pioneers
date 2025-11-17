@@ -13,6 +13,11 @@ export interface Candidate {
     url?: string;
     filename?: string;
   };
+  resume?: {
+    file?: File;
+    url?: string;
+    filename?: string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
   canEdit?: boolean; 

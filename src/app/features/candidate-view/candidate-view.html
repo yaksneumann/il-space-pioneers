@@ -191,6 +191,12 @@
           </div>
           
           <div class="action-buttons">
+            @if (canEdit && !isRecruiter()) {
+              <button (click)="editApplication()" class="cosmic-button primary">
+                <span class="btn-icon">✏️</span>
+                Edit Application
+              </button>
+            }
             <button (click)="goToDashboard()" class="cosmic-button tertiary">
               <span class="btn-icon">📊</span>
               Back to Dashboard

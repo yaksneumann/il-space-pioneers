@@ -16,13 +16,20 @@ interface ApplicationStatus {
 export class HomeComponent implements OnInit {
   applicationStatus = signal<ApplicationStatus | null>(null);
   hasExistingApplication = signal<boolean>(false);
+  hasMultipleApplications = signal<boolean>(false);
   candidateEmail = signal<string | null>(null);
   
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   private router = inject(Router);
 
   ngOnInit(): void {
     this.scrollToTop();
+    
+    if (this.authService.isRecruiter()) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+    
     this.checkApplicationStatus();
   }
 
@@ -37,10 +44,24 @@ export class HomeComponent implements OnInit {
       this.applicationStatus.set(status);
       this.hasExistingApplication.set(true);
       this.candidateEmail.set(user.email);
+      this.checkForMultipleApplications(user.email);
       return;
     }
 
     this.checkForExistingApplication();
+  }
+
+  private checkForMultipleApplications(email: string): void {
+    try {
+      const stored = localStorage.getItem('mockCandidates');
+      if (stored) {
+        const candidates = JSON.parse(stored);
+        const userApplications = candidates.filter((c: any) => c.email === email);
+        this.hasMultipleApplications.set(userApplications.length > 1);
+      }
+    } catch (error) {
+      console.error('Error checking for multiple applications:', error);
+    }
   }
 
   private checkForExistingApplication(): void {
@@ -58,6 +79,7 @@ export class HomeComponent implements OnInit {
           daysLeft: daysLeft
         });
         
+        this.checkForMultipleApplications(application.email);
         this.authService.setCandidateIdentity(application.email);
       }
     } catch (error) {
@@ -69,10 +91,10 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/register']);
   }
 
-  editApplication(): void {
+  addApplication(): void {
     const email = this.candidateEmail();
     if (email) {
-      this.router.navigate(['/register'], { queryParams: { email: email } });
+      this.router.navigate(['/register'], { queryParams: { email: email, mode: 'new' } });
     } else {
       this.router.navigate(['/register']);
     }
@@ -80,7 +102,13 @@ export class HomeComponent implements OnInit {
 
   newApplication(): void {
     this.authService.clearApplicationData();
-    this.authService.logout();
+    if (!this.authService.isRecruiter()) {
+      this.authService.logout();
+    }
     this.router.navigate(['/register']);
+  }
+
+  manageApplications(): void {
+    this.router.navigate(['/applications']);
   }
 }

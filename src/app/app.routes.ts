@@ -23,6 +23,11 @@ export const routes: Routes = [
     title: 'Recruiter Login | Space Pioneers'
   },
   {
+    path: 'applications',
+    loadComponent: () => import('./features/applications-manager/applications-manager.component').then(m => m.ApplicationsManagerComponent),
+    title: 'My Applications | Space Pioneers'
+  },
+  {
     path: 'register',
     loadComponent: () => import('./features/registration/registration').then(m => m.RegistrationComponent),
     title: 'Apply for Space Mission | Space Pioneers'

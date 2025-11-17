@@ -78,6 +78,7 @@ describe('HomeComponent', () => {
     it('should check application status on init', () => {
       const mockUser = { email: 'test@example.com', role: 'candidate' as const, id: '1', loginTime: Date.now() };
       const mockStatus = {
+        id: 'test-app-1',
         email: 'test@example.com',
         submissionDate: Date.now(),
         canEdit: true,
@@ -112,10 +113,22 @@ describe('HomeComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/register']);
     });
 
-    it('should navigate to registration when editApplication is called', () => {
-      component.editApplication();
+    it('should navigate to registration when addApplication is called', () => {
+      const testEmail = 'test@example.com';
+      component.candidateEmail.set(testEmail);
       
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/register']);
+      component.addApplication();
+      
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/register'], { queryParams: { email: testEmail, mode: 'new' } });
+    });
+
+    it('should navigate to applications manager when manageApplications is called', () => {
+      const testEmail = 'test@example.com';
+      component.candidateEmail.set(testEmail);
+      
+      component.manageApplications();
+      
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/applications'], { queryParams: { email: testEmail } });
     });
   });
 
@@ -134,6 +147,7 @@ describe('HomeComponent', () => {
       mockAuthService.isCandidate.and.returnValue(true);
       const mockUser = { email: 'test@example.com', role: 'candidate' as const, id: '1', loginTime: Date.now() };
       const mockStatus = {
+        id: 'test-app-2',
         email: 'test@example.com',
         submissionDate: Date.now(),
         canEdit: true,

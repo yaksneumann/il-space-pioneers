@@ -1,8 +1,17 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
+import * as L from 'leaflet';
 import { Candidate, CandidateStats } from '../../core/models/candidate.model';
-// import { SupabaseService } from '../../core/services/supabase.service';
+
+interface CityLocation {
+  city: string;
+  lat: number;
+  lng: number;
+  count: number;
+  candidates: Candidate[];
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -10,9 +19,11 @@ import { Candidate, CandidateStats } from '../../core/models/candidate.model';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
+  @ViewChild('ageChartCanvas', { static: false }) ageChartCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef<HTMLDivElement>;
+  
   private readonly router = inject(Router);
-  // private readonly supabaseService = inject(SupabaseService);
   private readonly HOURS_PER_DAY = 24;
   private readonly MS_PER_HOUR = 60 * 60 * 1000;
   private readonly LOCAL_STORAGE_KEY = 'mockCandidates';
@@ -23,9 +34,26 @@ export class DashboardComponent implements OnInit {
   searchTerm = '';
   sortBy: 'name' | 'date' | 'age' | 'city' = 'date';
   sortDirection: 'asc' | 'desc' = 'desc';
+  private ageChart: Chart | null = null;
+  private map: L.Map | null = null;
+
+  constructor() {
+    Chart.register(...registerables);
+  }
 
   ngOnInit(): void {
     this.loadDashboardData();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.candidates.length > 0) {
+      if (this.ageChartCanvas?.nativeElement) {
+        this.createAgeChart();
+      }
+      if (this.mapContainer?.nativeElement) {
+        this.createMap();
+      }
+    }
   }
 
   private async loadDashboardData(): Promise<void> {
@@ -43,7 +71,256 @@ export class DashboardComponent implements OnInit {
       this.candidates = [];
     } finally {
       this.isLoading = false;
+      this.createVisualizationsIfReady();
     }
+  }
+
+  private createVisualizationsIfReady(): void {
+    if (this.candidates.length > 0) {
+      if (this.ageChartCanvas?.nativeElement) {
+        this.createAgeChart();
+      }
+      if (this.mapContainer?.nativeElement) {
+        this.createMap();
+      }
+    }
+  }
+
+  private createAgeChart(): void {
+    if (!this.ageChartCanvas?.nativeElement) return;
+
+    const ageData = this.getAgeBreakdownData();
+    const ctx = this.ageChartCanvas.nativeElement.getContext('2d');
+    
+    if (!ctx) return;
+
+    if (this.ageChart) {
+      this.ageChart.destroy();
+    }
+
+    const config: ChartConfiguration = {
+      type: 'bar' as ChartType,
+      data: {
+        labels: ageData.map(item => item.range),
+        datasets: [{
+          label: 'Candidates',
+          data: ageData.map(item => item.count),
+          backgroundColor: [
+            'rgba(74, 144, 226, 0.9)',
+            'rgba(0, 200, 255, 0.9)',
+            'rgba(255, 140, 0, 0.9)',
+            'rgba(255, 65, 108, 0.9)',
+            'rgba(46, 204, 113, 0.9)',
+            'rgba(230, 126, 34, 0.9)',
+            'rgba(155, 89, 182, 0.9)'
+          ],
+          borderColor: [
+            'rgba(74, 144, 226, 1)',
+            'rgba(0, 200, 255, 1)',
+            'rgba(255, 140, 0, 1)',
+            'rgba(255, 65, 108, 1)',
+            'rgba(46, 204, 113, 1)',
+            'rgba(230, 126, 34, 1)',
+            'rgba(155, 89, 182, 1)'
+          ],
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            titleColor: '#FFFFFF',
+            bodyColor: '#E1E5E9',
+            borderColor: '#4A90E2',
+            borderWidth: 1,
+            titleFont: {
+              family: "'Exo 2', sans-serif",
+              size: 14,
+              weight: 600
+            },
+            bodyFont: {
+              family: "'Exo 2', sans-serif",
+              size: 12
+            },
+            callbacks: {
+              label: (context) => {
+                const percentage = ageData[context.dataIndex].percentage;
+                return `${context.parsed.y} candidates (${percentage}%)`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: '#E1E5E9',
+              font: {
+                family: "'Exo 2', sans-serif",
+                size: 12
+              }
+            },
+            border: {
+              color: 'rgba(74, 144, 226, 0.3)'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(74, 144, 226, 0.1)'
+            },
+            ticks: {
+              color: '#E1E5E9',
+              font: {
+                family: "'Exo 2', sans-serif",
+                size: 12
+              },
+              stepSize: 1
+            },
+            border: {
+              color: 'rgba(74, 144, 226, 0.3)'
+            }
+          }
+        }
+      }
+    };
+
+    this.ageChart = new Chart(ctx, config);
+  }
+
+  private createMap(): void {
+    if (!this.mapContainer?.nativeElement) return;
+
+    this.map = L.map(this.mapContainer.nativeElement).setView([31.5, 34.75], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    const cityData = this.getCityLocationData();
+    this.addCityMarkers(cityData);
+  }
+
+  private getCityLocationData(): CityLocation[] {
+    const cityCoordinates: Record<string, { lat: number; lng: number }> = {
+      'Tel Aviv': { lat: 32.0853, lng: 34.7818 },
+      'Jerusalem': { lat: 31.7683, lng: 35.2137 },
+      'Haifa': { lat: 32.7940, lng: 34.9896 },
+      'Beer Sheva': { lat: 31.2518, lng: 34.7915 },
+      'Eilat': { lat: 29.5577, lng: 34.9519 },
+      'Netanya': { lat: 32.3215, lng: 34.8532 },
+      'Ashdod': { lat: 31.7904, lng: 34.6496 },
+      'Rishon LeZion': { lat: 31.9730, lng: 34.7925 },
+      'Petah Tikva': { lat: 32.0853, lng: 34.8878 },
+      'Nazareth': { lat: 32.7022, lng: 35.3035 }
+    };
+
+    const cityGroups: Record<string, Candidate[]> = {};
+    this.candidates.forEach(candidate => {
+      const city = candidate.city;
+      if (!cityGroups[city]) {
+        cityGroups[city] = [];
+      }
+      cityGroups[city].push(candidate);
+    });
+
+    return Object.entries(cityGroups).map(([city, candidates]) => {
+      const coords = cityCoordinates[city] || { lat: 31.5, lng: 34.75 };
+      return {
+        city,
+        lat: coords.lat,
+        lng: coords.lng,
+        count: candidates.length,
+        candidates
+      };
+    });
+  }
+
+  private addCityMarkers(cityData: CityLocation[]): void {
+    if (!this.map) return;
+
+    cityData.forEach(cityInfo => {
+      const markerHtml = `
+        <div style="
+          background: #4A90E2;
+          color: white;
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 12px;
+          border: 2px solid white;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        ">${cityInfo.count}</div>
+      `;
+
+      const customIcon = L.divIcon({
+        html: markerHtml,
+        className: 'custom-marker',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+
+      const popupContent = `
+        <div style="min-width: 200px;">
+          <h3 style="margin: 0 0 10px 0; color: #4A90E2;">${cityInfo.city}</h3>
+          <p style="margin: 0 0 10px 0; font-weight: bold;">${cityInfo.count} candidate${cityInfo.count > 1 ? 's' : ''}</p>
+          <div style="max-height: 150px; overflow-y: auto;">
+            ${cityInfo.candidates.map(candidate => `
+              <div style="padding: 5px 0; border-bottom: 1px solid #eee;">
+                <strong>${candidate.firstName} ${candidate.lastName}</strong><br>
+                <small>Age: ${candidate.age} | ${candidate.email}</small>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      L.marker([cityInfo.lat, cityInfo.lng], { icon: customIcon })
+        .bindPopup(popupContent)
+        .addTo(this.map!);
+    });
+  }
+
+  private getAgeBreakdownData(): { range: string; count: number; percentage: number }[] {
+    const ranges = [
+      { min: 18, max: 24, range: '18-24' },
+      { min: 25, max: 29, range: '25-29' },
+      { min: 30, max: 34, range: '30-34' },
+      { min: 35, max: 39, range: '35-39' },
+      { min: 40, max: 44, range: '40-44' },
+      { min: 45, max: 49, range: '45-49' },
+      { min: 50, max: 100, range: '50+' }
+    ];
+
+    const total = this.candidates.length;
+    
+    return ranges.map(range => {
+      const count = this.candidates.filter(candidate => 
+        candidate.age >= range.min && candidate.age <= range.max
+      ).length;
+      
+      const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+      
+      return {
+        range: range.range,
+        count,
+        percentage
+      };
+    }).filter(item => item.count > 0);
   }
 
   get filteredCandidates(): Candidate[] {
@@ -178,9 +455,9 @@ export class DashboardComponent implements OnInit {
 
   private loadCandidatesFromLocalStorage(): Candidate[] {
     try {
-      const raw = localStorage.getItem(this.LOCAL_STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as Candidate[];
+      const storedData = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!storedData) return [];
+      const parsed = JSON.parse(storedData) as Candidate[];
       
       return parsed.map(candidate => ({
         ...candidate,

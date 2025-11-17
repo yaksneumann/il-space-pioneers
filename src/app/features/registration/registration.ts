@@ -1,7 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, signal, computed } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-// import { SupabaseService } from '../../core/services/supabase.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Candidate, CandidateFormData } from '../../core/models/candidate.model';
 
@@ -13,9 +12,9 @@ import { Candidate, CandidateFormData } from '../../core/models/candidate.model'
 })
 export class RegistrationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  // private readonly supabaseService = inject(SupabaseService);
   private readonly authService = inject(AuthService);
   private readonly LOCAL_STORAGE_KEY = 'mockCandidates';
 
@@ -29,10 +28,27 @@ export class RegistrationComponent implements OnInit {
   ];
 
   registrationForm!: FormGroup;
-  currentStep = 1;
-  isSubmitting = false;
-  isSubmitted = false;
-  isEditMode = false;
+  currentStep = signal(1);
+  isSubmitting = signal(false);
+  isSubmitted = signal(false);
+  mode = signal<'new' | 'edit' | 'view'>('new');
+  candidateData = signal<Candidate | null>(null);
+  
+  isEditMode = computed(() => this.mode() === 'edit');
+  isViewMode = computed(() => this.mode() === 'view');
+  daysLeft = computed(() => {
+    const candidate = this.candidateData();
+    if (!candidate) return 30;
+    const appStatus = this.authService.getApplicationStatus(candidate.email);
+    return appStatus?.daysLeft ?? 30;
+  });
+  formProgress = computed(() => {
+    const totalFields = Object.keys(this.registrationForm?.controls || {}).length;
+    if (totalFields === 0) return 0;
+    const validFields = Object.values(this.registrationForm.controls)
+      .filter(control => control.valid).length;
+    return Math.round((validFields / totalFields) * 100);
+  });
   
   firstName!: AbstractControl;
   lastName!: AbstractControl;
@@ -43,22 +59,20 @@ export class RegistrationComponent implements OnInit {
   hobbies!: AbstractControl;
   motivation!: AbstractControl;
   
-  daysLeft = 30;
   editTimeRemaining = '';
   candidateToken: string | null = null;
   
   selectedImage?: File;
   imagePreview?: string;
   imageError?: string;
+  profileImageFilename?: string;
   selectedResume?: File;
   resumeError?: string;
 
   ngOnInit(): void {
     this.scrollToTop();
     this.initializeForm();
-    setTimeout(() => {
-      this.checkEditMode();
-    }, 100);
+    this.checkEditMode();
   }
 
   private initializeForm(): void {
@@ -81,28 +95,57 @@ export class RegistrationComponent implements OnInit {
     this.city = this.registrationForm.get('city')!;
     this.hobbies = this.registrationForm.get('hobbies')!;
     this.motivation = this.registrationForm.get('motivation')!;
+    
+    this.email.valueChanges.subscribe((value) => {
+    });
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
 
   private async checkEditMode(): Promise<void> {
     const queryEmail = this.route.snapshot.queryParams['email'];
+    const queryId = this.route.snapshot.queryParams['id'];
+    const mode = this.route.snapshot.queryParams['mode'];
     
-    if (queryEmail) {
+    if (queryEmail && queryId && (mode === 'edit' || mode === 'view')) {
+      try {
+        const candidate = this.getCandidateByIdFromLocalStorage(queryId);
+        
+        if (candidate) {
+          this.mode.set(mode as 'edit' | 'view');
+          this.candidateData.set(candidate);
+          this.populateFormWithCandidateData(candidate);
+          
+          if (this.isViewMode()) {
+            this.registrationForm.disable();
+          }
+          
+          this.authService.setCandidateIdentity(queryEmail);
+          return;
+        }
+      } catch (error) {
+        console.error('Error loading candidate for edit from query param:', error);
+      }
+    }
+    
+    if (queryEmail && !queryId) {
       try {
         const candidate = this.getCandidateByEmailFromLocalStorage(queryEmail);
         
         if (candidate) {
-          this.isEditMode = true;
+          this.mode.set('edit');
+          this.candidateData.set(candidate);
           this.populateFormWithCandidateData(candidate);
           
           this.authService.setCandidateIdentity(queryEmail);
           
           const appStatus = this.authService.getApplicationStatus(queryEmail);
-          if (appStatus) {
-            this.daysLeft = appStatus.daysLeft;
-            if (!appStatus.canEdit) {
-              this.router.navigate(['/candidate'], { queryParams: { email: queryEmail } });
-              return;
-            }
+          if (appStatus && !appStatus.canEdit) {
+            this.router.navigate(['/candidate'], { queryParams: { email: queryEmail } });
+            return;
           }
           return;
         }
@@ -119,13 +162,14 @@ export class RegistrationComponent implements OnInit {
 
     const token = this.authService.getCandidateToken();
     if (token) {
-      this.isEditMode = true;
+      this.mode.set('edit');
       this.candidateToken = btoa(JSON.stringify(token));
       this.editTimeRemaining = this.authService.getEditTimeRemaining();
       
       try {
         const candidate = this.getCandidateByEmailFromLocalStorage(token.email);
         if (candidate) {
+          this.candidateData.set(candidate);
           this.populateFormWithCandidateData(candidate);
         }
       } catch (error) {
@@ -139,13 +183,13 @@ export class RegistrationComponent implements OnInit {
       const appStatus = this.authService.getApplicationStatus(currentUser.email);
       
       if (appStatus) {
-        this.isEditMode = true;
-        this.daysLeft = appStatus.daysLeft;
+        this.mode.set('edit');
         
         if (appStatus.canEdit) {
           try {
             const candidate = this.getCandidateByEmailFromLocalStorage(currentUser.email);
             if (candidate) {
+              this.candidateData.set(candidate);
               this.populateFormWithCandidateData(candidate);
             }
           } catch (error) {
@@ -172,14 +216,12 @@ export class RegistrationComponent implements OnInit {
 
     if (candidate.profileImage?.url) {
       this.imagePreview = candidate.profileImage.url;
+      this.profileImageFilename = candidate.profileImage.filename;
     }
-  }
-
-  get formProgress(): number {
-    const totalFields = Object.keys(this.registrationForm.controls).length;
-    const validFields = Object.values(this.registrationForm.controls)
-      .filter(control => control.valid).length;
-    return Math.round((validFields / totalFields) * 100);
+    
+    if (candidate.resume?.filename) {
+      this.selectedResume = new File([''], candidate.resume.filename, { type: 'application/pdf' });
+    }
   }
 
   isStepValid(step: number): boolean {
@@ -201,14 +243,14 @@ export class RegistrationComponent implements OnInit {
   }
 
   nextStep(): void {
-    if (this.isStepValid(this.currentStep) && this.currentStep < 3) {
-      this.currentStep++;
+    if ((this.isViewMode() || this.isStepValid(this.currentStep())) && this.currentStep() < 3) {
+      this.currentStep.set(this.currentStep() + 1);
     }
   }
 
   previousStep(): void {
-    if (this.currentStep > 1) {
-      this.currentStep--;
+    if (this.currentStep() > 1) {
+      this.currentStep.set(this.currentStep() - 1);
     }
   }
 
@@ -254,6 +296,7 @@ export class RegistrationComponent implements OnInit {
     }
 
     this.selectedImage = file;
+    this.profileImageFilename = file.name;
     this.createImagePreview(file);
   }
 
@@ -261,6 +304,10 @@ export class RegistrationComponent implements OnInit {
     const reader = new FileReader();
     reader.onload = (e) => {
       this.imagePreview = e.target?.result as string;
+      try {
+        this.cdr.detectChanges();
+      } catch (err) {
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -321,23 +368,26 @@ export class RegistrationComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
-    if (this.registrationForm.invalid || this.isSubmitting) {
+    if (this.registrationForm.invalid || this.isSubmitting() || this.isViewMode()) {
       return;
     }
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
 
     try {
+      const profileImageData = await this.convertFileToBase64(this.selectedImage);
+      const resumeData = await this.convertFileToBase64(this.selectedResume);
+
       const formData: CandidateFormData = {
         ...this.registrationForm.value,
         profileImage: this.selectedImage,
         resume: this.selectedResume
       };
 
-      const result = this.submitCandidateToLocalStorage(formData);
+      const result = this.submitCandidateToLocalStorage(formData, profileImageData, resumeData);
 
       if (result) {
-        this.isSubmitted = true;
+        this.isSubmitted.set(true);
         this.authService.saveApplication(result);
         this.candidateToken = this.authService.generateCandidateToken(result.id!, result.email);
         this.editTimeRemaining = this.authService.getEditTimeRemaining();
@@ -347,8 +397,23 @@ export class RegistrationComponent implements OnInit {
     } catch (error) {
       console.error('Error submitting form:', error);
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
+      try {
+        this.cdr.detectChanges();
+      } catch (err) {
+      }
     }
+  }
+
+  private convertFileToBase64(file?: File): Promise<string | undefined> {
+    if (!file) return Promise.resolve(undefined);
+    
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   private scrollToTop(): void {
@@ -356,33 +421,12 @@ export class RegistrationComponent implements OnInit {
     document.documentElement.scrollTop = 0;
   }
 
-  clearForm(): void {
-    if (confirm('Are you sure you want to clear your application? This action cannot be undone. This will permanently delete your application data.')) {
-      const currentUser = this.authService.getCurrentUser();
-      const userEmail = currentUser?.email || this.registrationForm.get('email')?.value;
-      
-      this.registrationForm.reset();
-      this.currentStep = 1;
-      this.isSubmitted = false;
-      this.isEditMode = false;
-      this.candidateToken = null;
-      this.editTimeRemaining = '';
-      this.selectedImage = undefined;
-      this.imagePreview = undefined;
-      this.imageError = undefined;
-      this.selectedResume = undefined;
-      this.resumeError = undefined;
-      
-      this.authService.clearCandidateToken();
-      this.authService.clearApplicationData();
-      this.authService.logout();
-      
-      if (userEmail) {
-        this.removeCandidateFromStorage(userEmail);
-      }
-      
-      this.scrollToTop();
-    }
+  submitAnotherApplication(): void {
+    this.router.navigate(['/applications']);
+  }
+
+  navigateToApplications(): void {
+    this.router.navigate(['/applications']);
   }
 
   private removeCandidateFromStorage(email: string): void {
@@ -399,32 +443,73 @@ export class RegistrationComponent implements OnInit {
     }
   }
 
+  private removeAllCandidatesFromStorage(email: string): void {
+    try {
+      const candidatesKey = 'mockCandidates';
+      const stored = localStorage.getItem(candidatesKey);
+      if (stored) {
+        const candidates = JSON.parse(stored);
+        const filteredCandidates = candidates.filter((c: any) => c.email !== email);
+        localStorage.setItem(candidatesKey, JSON.stringify(filteredCandidates));
+      }
+    } catch (error) {
+      console.warn('Error removing all candidates from localStorage:', error);
+    }
+  }
+
   private getCandidateByEmailFromLocalStorage(email: string): Candidate | null {
     try {
       const stored = localStorage.getItem(this.LOCAL_STORAGE_KEY);
       if (!stored) return null;
       
       const candidates: Candidate[] = JSON.parse(stored);
-      const found = candidates.find(c => c.email === email);
+      const found = candidates.filter(c => c.email === email);
       
-      if (found) {
-        return {
-          ...found,
-          createdAt: found.createdAt ? new Date(found.createdAt) : undefined,
-          updatedAt: found.updatedAt ? new Date(found.updatedAt) : undefined
-        };
-      }
+      if (found.length === 0) return null;
       
-      return null;
+      const sorted = found.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
+      
+      const mostRecent = sorted[0];
+      return {
+        ...mostRecent,
+        createdAt: mostRecent.createdAt ? new Date(mostRecent.createdAt) : undefined,
+        updatedAt: mostRecent.updatedAt ? new Date(mostRecent.updatedAt) : undefined
+      };
     } catch (error) {
       console.warn('Error loading candidate from localStorage:', error);
       return null;
     }
   }
 
-  private submitCandidateToLocalStorage(formData: CandidateFormData): Candidate {
+  private getCandidateByIdFromLocalStorage(id: string): Candidate | null {
+    try {
+      const stored = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!stored) return null;
+      
+      const candidates: Candidate[] = JSON.parse(stored);
+      const found = candidates.find(c => c.id === id);
+      
+      if (!found) return null;
+      
+      return {
+        ...found,
+        createdAt: found.createdAt ? new Date(found.createdAt) : undefined,
+        updatedAt: found.updatedAt ? new Date(found.updatedAt) : undefined
+      };
+    } catch (error) {
+      console.warn('Error loading candidate by ID from localStorage:', error);
+      return null;
+    }
+  }
+
+  private submitCandidateToLocalStorage(formData: CandidateFormData, profileImageData?: string, resumeData?: string): Candidate {
+    const existingCandidate = this.candidateData();
     const newCandidate: Candidate = {
-      id: 'submitted-' + Date.now(),
+      id: existingCandidate?.id || 'submitted-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11),
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
@@ -435,9 +520,13 @@ export class RegistrationComponent implements OnInit {
       motivation: formData.motivation,
       profileImage: formData.profileImage ? {
         filename: formData.profileImage.name,
-        url: 'mock-url-' + Date.now()
-      } : undefined,
-      createdAt: new Date(),
+        url: profileImageData || 'mock-url-' + Date.now()
+      } : existingCandidate?.profileImage,
+      resume: formData.resume ? {
+        filename: formData.resume.name,
+        url: resumeData || 'mock-resume-url-' + Date.now()
+      } : existingCandidate?.resume,
+      createdAt: existingCandidate?.createdAt || new Date(),
       updatedAt: new Date(),
       canEdit: true
     };
@@ -446,7 +535,10 @@ export class RegistrationComponent implements OnInit {
       const stored = localStorage.getItem(this.LOCAL_STORAGE_KEY);
       const existingCandidates: Candidate[] = stored ? JSON.parse(stored) : [];
       
-      const filteredCandidates = existingCandidates.filter(c => c.email !== newCandidate.email);
+      let filteredCandidates = existingCandidates;
+      if (this.isEditMode() && existingCandidate) {
+        filteredCandidates = existingCandidates.filter(c => c.id !== existingCandidate.id);
+      }
       
       const updatedCandidates = [newCandidate, ...filteredCandidates];
       

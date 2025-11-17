@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-// import { SupabaseService } from '../../core/services/supabase.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Candidate } from '../../core/models/candidate.model';
 
@@ -14,7 +13,6 @@ import { Candidate } from '../../core/models/candidate.model';
 export class CandidateViewComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  // private readonly supabaseService = inject(SupabaseService);
   private readonly authService = inject(AuthService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly EDIT_DEADLINE_DAYS = 3;
@@ -37,12 +35,11 @@ export class CandidateViewComponent implements OnInit {
 
   private async loadCandidate(): Promise<void> {
     const email = this.route.snapshot.queryParams['email'];
-    
+
     if (!email) {
       this.router.navigate(['/']);
       return;
     }
-
     this.isLoading = true;
     this.error = null;
 
@@ -60,15 +57,14 @@ export class CandidateViewComponent implements OnInit {
     } catch (error) {
       console.error('Error loading candidate:', error);
       this.error = 'Failed to load application: ' + (error as Error).message;
-    } finally {
-      this.isLoading = false;
-      this.cdr.detectChanges();
     }
+    
+    this.isLoading = false;
   }
 
   private calculateDaysLeft(): void {
     if (!this.candidate?.createdAt) return;
-    
+
     const createdDate = new Date(this.candidate.createdAt);
     const now = new Date();
     const editDeadline = this.EDIT_DEADLINE_DAYS * this.MS_PER_DAY;
@@ -130,9 +126,9 @@ export class CandidateViewComponent implements OnInit {
 
   private loadCandidatesFromLocalStorage(): Candidate[] {
     try {
-      const raw = localStorage.getItem(this.LOCAL_STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as Candidate[];
+      const storedData = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!storedData) return [];
+      const parsed = JSON.parse(storedData) as Candidate[];
       
       return parsed.map(candidate => ({
         ...candidate,

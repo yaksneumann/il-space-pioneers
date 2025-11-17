@@ -57,6 +57,42 @@
             </div>
           </div>
           </div>
+          
+          <div class="chart-section">            
+            <div class="chart-card cosmic-card">
+              <div class="chart-header">
+                <h3 class="chart-title">
+                  <span class="chart-icon">📊</span>
+                  Age Distribution
+                </h3>
+                <p class="chart-subtitle">Candidate age breakdown by 5-year ranges</p>
+              </div>
+              <div class="chart-container">
+                <canvas #ageChartCanvas></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <div class="map-section">
+            <div class="map-card cosmic-card">
+              <div class="map-header">
+                <h3 class="map-title">
+                  <span class="map-icon">🗺️</span>
+                  Candidate Locations
+                </h3>
+                <p class="map-subtitle">Geographic distribution of mission applicants across Israel</p>
+              </div>
+              <div class="map-container">
+                <div #mapContainer id="candidate-map" class="leaflet-map"></div>
+              </div>
+              <div class="map-legend">
+                <div class="legend-item">
+                  <span class="legend-marker">📍</span>
+                  <span class="legend-text">Candidate locations with application counts</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       }
 

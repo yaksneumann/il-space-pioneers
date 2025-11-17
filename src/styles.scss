@@ -1,6 +1,7 @@
 
 @use '@angular/material' as mat;
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap');
+@import 'leaflet/dist/leaflet.css';
 
 :root {
   --color-primary: #1A1A2E;
@@ -627,4 +628,46 @@ body {
   .footer-link {
     transition: none;
   }
+}
+
+.leaflet-container {
+  background: var(--color-background);
+  font-family: 'Exo 2', sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  border-radius: 8px;
+  border: 1px solid rgba(74, 144, 226, 0.3);
+}
+
+.leaflet-popup-tip {
+  background: var(--color-surface);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+}
+
+.leaflet-popup-content {
+  margin: 12px 16px;
+  line-height: 1.4;
+}
+
+.leaflet-control-zoom a {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(74, 144, 226, 0.1);
+  color: var(--primary-color);
+}
+
+.leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.custom-marker {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }

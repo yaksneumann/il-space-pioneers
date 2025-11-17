@@ -25,19 +25,38 @@
                   <strong>{{ applicationStatus()!.daysLeft }} more day{{ applicationStatus()!.daysLeft !== 1 ? 's' : '' }}</strong>
                 </p>
                 <div class="status-actions">
-                  <button (click)="editApplication()" class="cosmic-button">
-                    <span class="btn-icon">✏️</span>
-                    Edit Application
-                  </button>
+                  @if (hasMultipleApplications()) {
+                    <button (click)="manageApplications()" class="cosmic-button">
+                      <span class="btn-icon">📋</span>
+                      Manage All Applications
+                    </button>
+                    <button (click)="addApplication()" class="cosmic-button secondary">
+                      <span class="btn-icon">➕</span>
+                      Add Application
+                    </button>
+                  } @else {
+                    <button (click)="addApplication()" class="cosmic-button">
+                      <span class="btn-icon">➕</span>
+                      Add Application
+                    </button>
+                    <button (click)="manageApplications()" class="cosmic-button secondary">
+                      <span class="btn-icon">📋</span>
+                      Manage All Applications
+                    </button>
+                  }
                 </div>
               } @else {
                 <p class="cosmic-body">
                   Your edit period has expired. You can view your application or submit a new one.
                 </p>
                 <div class="status-actions">
-                  <button (click)="newApplication()" class="cosmic-button">
-                    <span class="btn-icon">📝</span>
-                    New Application
+                  <button (click)="addApplication()" class="cosmic-button">
+                    <span class="btn-icon">➕</span>
+                    Add Application
+                  </button>
+                  <button (click)="manageApplications()" class="cosmic-button secondary">
+                    <span class="btn-icon">📋</span>
+                    Manage All Applications
                   </button>
                 </div>
               }
@@ -48,6 +67,10 @@
             <button (click)="startApplication()" class="cosmic-button cta-button">
               <span class="btn-icon">🚀</span>
               <span>Apply Now</span>
+            </button>
+            <button (click)="manageApplications()" class="cosmic-button secondary">
+              <span class="btn-icon">📋</span>
+              <span>Manage My Applications</span>
             </button>
             <p class="cta-note">Application takes ~5 minutes</p>
           </div>

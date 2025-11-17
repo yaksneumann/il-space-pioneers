@@ -163,9 +163,9 @@ export class SupabaseService {
 
   private loadCandidatesFromLocalStorage(): Candidate[] {
     try {
-      const raw = localStorage.getItem(this.LOCAL_STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as Candidate[];
+      const storedData = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!storedData) return [];
+      const parsed = JSON.parse(storedData) as Candidate[];
       
       return parsed.map(candidate => ({
         ...candidate,

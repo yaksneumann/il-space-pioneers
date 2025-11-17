@@ -1,6 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
 import { environment } from '@env';
 export interface AuthToken {
   candidateId: string;
@@ -17,6 +16,7 @@ export interface UserProfile {
 }
 
 export interface CandidateApplication {
+  id: string;
   email: string;
   submissionDate: number;
   canEdit: boolean;
@@ -24,6 +24,7 @@ export interface CandidateApplication {
 }
 
 export interface CandidateData {
+  id?: string;
   email: string;
   [key: string]: any;
 }
@@ -41,11 +42,10 @@ export class AuthService {
   private readonly MS_PER_MINUTE = 60 * 1000;
 
   private router = inject(Router);
-  private currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
+  private currentUser = signal<UserProfile | null>(null);
   
-  currentUser$ = this.currentUserSubject.asObservable();
   isAuthenticated = signal(false);
-  private userRole = signal<'recruiter' | 'candidate' | null>(null);
+  userRole = signal<'recruiter' | 'candidate' | null>(null);
 
   constructor() {
     this.loadUserFromStorage();
@@ -65,7 +65,7 @@ export class AuthService {
   }
 
   private setCurrentUser(user: UserProfile | null): void {
-    this.currentUserSubject.next(user);
+    this.currentUser.set(user);
     this.isAuthenticated.set(!!user);
     this.userRole.set(user?.role || null);
     
@@ -73,6 +73,7 @@ export class AuthService {
       localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     } else {
       localStorage.removeItem(this.USER_KEY);
+      localStorage.removeItem(this.TOKEN_KEY);
     }
   }
 
@@ -110,7 +111,10 @@ export class AuthService {
   }
 
   logout(): void {
+    localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem(this.TOKEN_KEY);
     this.setCurrentUser(null);
+    this.clearCandidateToken();
     this.router.navigate(['/']);
   }
 
@@ -123,41 +127,79 @@ export class AuthService {
   }
 
   getCurrentUser(): UserProfile | null {
-    return this.currentUserSubject.value;
+    return this.currentUser();
+  }
+
+  getCurrentUserSignal() {
+    return this.currentUser;
   }
 
   saveApplication(candidateData: CandidateData): void {
     try {
+      const applicationId = candidateData.id || `app-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+      
       const applicationData: CandidateApplication = {
+        id: applicationId,
         email: candidateData.email,
         submissionDate: Date.now(),
         canEdit: true,
         daysLeft: this.TOKEN_DURATION_DAYS
       };
 
-      localStorage.setItem(this.APPLICATION_KEY, JSON.stringify(applicationData));
+      const existingApplications = this.getAllApplications();
+      
+      const updatedApplications = existingApplications.filter((app: CandidateApplication) => app.id !== applicationId);
+      updatedApplications.push(applicationData);
+
+      localStorage.setItem(this.APPLICATION_KEY, JSON.stringify(updatedApplications));
       this.setCandidateIdentity(candidateData.email);
     } catch (error) {
       console.error('Error saving application:', error);
     }
   }
 
-  getApplicationStatus(email?: string): CandidateApplication | null {
+  getAllApplications(): CandidateApplication[] {
     try {
       const stored = localStorage.getItem(this.APPLICATION_KEY);
-      if (!stored) return null;
+      if (!stored) return [];
 
-      const application: CandidateApplication = JSON.parse(stored);
-      
-      if (email && application.email !== email) {
-        return null;
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      } else if (parsed.email) {
+        const legacyApp: CandidateApplication = {
+          id: `legacy-${parsed.email}-${parsed.submissionDate}`,
+          email: parsed.email,
+          submissionDate: parsed.submissionDate,
+          canEdit: parsed.canEdit,
+          daysLeft: parsed.daysLeft
+        };
+        return [legacyApp];
       }
+      
+      return [];
+    } catch (error) {
+      console.error('Error getting applications:', error);
+      return [];
+    }
+  }
 
-      const daysPassed = Math.floor((Date.now() - application.submissionDate) / this.MS_PER_DAY);
+  getApplicationStatus(email?: string): CandidateApplication | null {
+    try {
+      const applications = this.getAllApplications();
+      
+      if (!email) return null;
+      
+      const userApplications = applications.filter(app => app.email === email);
+      if (userApplications.length === 0) return null;
+      
+      const mostRecentApp = userApplications.sort((a, b) => b.submissionDate - a.submissionDate)[0];
+      
+      const daysPassed = Math.floor((Date.now() - mostRecentApp.submissionDate) / this.MS_PER_DAY);
       const daysLeft = Math.max(0, this.TOKEN_DURATION_DAYS - daysPassed);
       
       return {
-        ...application,
+        ...mostRecentApp,
         canEdit: daysLeft > 0,
         daysLeft: daysLeft
       };
@@ -167,12 +209,23 @@ export class AuthService {
     }
   }
 
-  hasApplied(email?: string): boolean {
-    return this.getApplicationStatus(email) !== null;
+  getApplicationsByEmail(email: string): CandidateApplication[] {
+    return this.getAllApplications().filter(app => app.email === email);
   }
 
-  clearApplicationData(): void {
-    localStorage.removeItem(this.APPLICATION_KEY);
+  hasApplied(email?: string): boolean {
+    if (!email) return false;
+    return this.getApplicationsByEmail(email).length > 0;
+  }
+
+  clearApplicationData(email?: string): void {
+    if (email) {
+      const allApplications = this.getAllApplications();
+      const filteredApplications = allApplications.filter((app: CandidateApplication) => app.email !== email);
+      localStorage.setItem(this.APPLICATION_KEY, JSON.stringify(filteredApplications));
+    } else {
+      localStorage.removeItem(this.APPLICATION_KEY);
+    }
   }
 
   generateCandidateToken(candidateId: string, email: string): string {
