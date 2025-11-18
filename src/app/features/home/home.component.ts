@@ -1,11 +1,7 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-
-interface ApplicationStatus {
-  canEdit: boolean;
-  daysLeft: number;
-}
+import { ApplicationStatus } from '../../core/models/candidate.model';
 
 @Component({
   selector: 'app-home',
@@ -29,12 +25,12 @@ export class HomeComponent implements OnInit {
       this.router.navigate(['/dashboard']);
       return;
     }
-    
     this.checkApplicationStatus();
   }
 
   private scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
   }
 
   private checkApplicationStatus(): void {

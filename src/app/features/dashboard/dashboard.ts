@@ -3,15 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import * as L from 'leaflet';
-import { Candidate, CandidateStats } from '../../core/models/candidate.model';
-
-interface CityLocation {
-  city: string;
-  lat: number;
-  lng: number;
-  count: number;
-  candidates: Candidate[];
-}
+import { Candidate, CandidateStats, CityLocation } from '../../core/models/candidate.model';
 
 @Component({
   selector: 'app-dashboard',

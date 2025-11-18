@@ -61,6 +61,14 @@ export interface CityStats {
   };
 }
 
+export interface CityLocation {
+  city: string;
+  lat: number;
+  lng: number;
+  count: number;
+  candidates: Candidate[];
+}
+
 export interface VisitorData {
   sessionId: string;
   visitedAt: Date;
@@ -74,4 +82,9 @@ export interface ContactForm {
   email: string;
   subject: string;
   message: string;
+}
+
+export interface ApplicationStatus {
+  canEdit: boolean;
+  daysLeft: number;
 }
