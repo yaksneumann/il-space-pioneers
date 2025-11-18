@@ -54,12 +54,15 @@
 
 .hero-cta {
   margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .cta-button {
   font-size: $font-size-subtitle;
   padding: 1.25rem 2.5rem;
-  margin-bottom: 1rem;
   background: $primary-gradient;
   border: none;
   border-radius: 8px;
@@ -67,9 +70,30 @@
   cursor: pointer;
   transition: $transition-base;
   font-weight: 600;
+  min-width: 200px;
   
   &:hover {
     transform: translateY(-2px);
+    box-shadow: $shadow-hover;
+  }
+}
+
+.cosmic-button.secondary {
+  font-size: $font-size-subtitle;
+  padding: 1.25rem 2.5rem;
+  background: transparent;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-base;
+  font-weight: 600;
+  min-width: 200px;
+  
+  &:hover {
+    transform: translateY(-2px);
+    background: $card-bg;
+    border-color: $primary-color;
     box-shadow: $shadow-hover;
   }
 }

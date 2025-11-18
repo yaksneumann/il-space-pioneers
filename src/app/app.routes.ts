@@ -24,7 +24,7 @@ export const routes: Routes = [
   },
   {
     path: 'applications',
-    loadComponent: () => import('./features/applications-manager/applications-manager.component').then(m => m.ApplicationsManagerComponent),
+    loadComponent: () => import('./features/applications-manager/applications-manager.component').then(m => m.ApplicationsComponent),
     title: 'My Applications | Space Pioneers'
   },
   {

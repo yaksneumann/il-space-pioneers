@@ -12,11 +12,12 @@ import { Candidate } from '../../core/models/candidate.model';
   templateUrl: './applications-manager.component.html',
   styleUrl: './applications-manager.component.scss'
 })
-export class ApplicationsManagerComponent implements OnInit {
+export class ApplicationsComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly authService = inject(AuthService);
   private readonly LOCAL_STORAGE_KEY = 'mockCandidates';
+  private debounceTimer?: number;
 
   userEmail = '';
   applications: Candidate[] = [];
@@ -36,12 +37,28 @@ export class ApplicationsManagerComponent implements OnInit {
 
   onEmailChange(): void {
     this.emailError = '';
-    if (this.userEmail && this.isValidEmail(this.userEmail)) {
-      this.loadApplicationsByEmail(this.userEmail);
-    } else if (!this.userEmail || this.userEmail.trim() === '') {
+    
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    
+    if (!this.userEmail || this.userEmail.trim() === '') {
       this.loadAllApplications();
+      return;
+    }
+    
+    this.debounceTimer = window.setTimeout(() => {
+      if (this.userEmail && this.userEmail.trim() !== '') {
+        this.loadApplicationsByEmail(this.userEmail.trim());
+      }
+    }, 300);
+  }
+
+  filterApplications(): void {
+    if (this.userEmail && this.userEmail.trim() !== '') {
+      this.loadApplicationsByEmail(this.userEmail.trim());
     } else {
-      this.applications = [];
+      this.loadAllApplications();
     }
   }
 

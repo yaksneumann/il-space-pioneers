@@ -12,12 +12,13 @@
           type="email" 
           [(ngModel)]="userEmail" 
           (input)="onEmailChange()"
+          (keyup.enter)="onEmailChange()"
           placeholder="Enter email to filter applications (leave empty to see all)"
           class="email-input"
           [class.error]="emailError">
         <button 
           type="button" 
-          (click)="userEmail ? loadApplicationsByEmail(userEmail) : loadAllApplications()"
+          (click)="filterApplications()"
           class="load-btn"
           [disabled]="isLoading">
           {{ isLoading ? 'Loading...' : (userEmail ? 'Filter by Email' : 'Show All Applications') }}

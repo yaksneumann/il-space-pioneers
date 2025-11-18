@@ -11,16 +11,8 @@ describe('HomeComponent', () => {
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', [
-      'isRecruiter',
-      'isCandidate',
-      'getApplicationStatus',
-      'getCurrentUser',
-      'logout',
-      'clearApplicationData',
-      'isAuthenticated'
-    ], {
-      isAuthenticated: jasmine.createSpy('isAuthenticated').and.returnValue(() => false)
-    });
+      'isRecruiter'
+    ]);
     
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -42,180 +34,99 @@ describe('HomeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('User Authentication Status', () => {
-    it('should show recruiter navigation when user is recruiter', () => {
+  describe('Recruiter Navigation', () => {
+    it('should redirect recruiters to dashboard on init', () => {
       mockAuthService.isRecruiter.and.returnValue(true);
-      mockAuthService.isCandidate.and.returnValue(false);
-      
-      fixture.detectChanges();
-      
-      expect(mockAuthService.isRecruiter).toHaveBeenCalled();
-      expect(mockAuthService.isCandidate).toHaveBeenCalled();
-    });
-
-    it('should show candidate navigation when user is candidate', () => {
-      mockAuthService.isRecruiter.and.returnValue(false);
-      mockAuthService.isCandidate.and.returnValue(true);
-      
-      fixture.detectChanges();
-      
-      expect(mockAuthService.isRecruiter).toHaveBeenCalled();
-      expect(mockAuthService.isCandidate).toHaveBeenCalled();
-    });
-
-    it('should show guest navigation when user is neither recruiter nor candidate', () => {
-      mockAuthService.isRecruiter.and.returnValue(false);
-      mockAuthService.isCandidate.and.returnValue(false);
-      
-      fixture.detectChanges();
-      
-      expect(mockAuthService.isRecruiter).toHaveBeenCalled();
-      expect(mockAuthService.isCandidate).toHaveBeenCalled();
-    });
-  });
-
-  describe('Application Status', () => {
-    it('should check application status on init', () => {
-      const mockUser = { email: 'test@example.com', role: 'candidate' as const, id: '1', loginTime: Date.now() };
-      const mockStatus = {
-        id: 'test-app-1',
-        email: 'test@example.com',
-        submissionDate: Date.now(),
-        canEdit: true,
-        daysLeft: 2
-      };
-      
-      mockAuthService.getCurrentUser.and.returnValue(mockUser);
-      mockAuthService.getApplicationStatus.and.returnValue(mockStatus);
       
       component.ngOnInit();
       
-      expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
-      expect(component.applicationStatus()).toEqual(mockStatus);
+      expect(mockAuthService.isRecruiter).toHaveBeenCalled();
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
     });
 
-    it('should not set application status for non-candidate users', () => {
-      const mockUser = { email: 'recruiter@example.com', role: 'recruiter' as const, id: '1', loginTime: Date.now() };
-      
-      mockAuthService.getCurrentUser.and.returnValue(mockUser);
+    it('should not redirect non-recruiters', () => {
+      mockAuthService.isRecruiter.and.returnValue(false);
       
       component.ngOnInit();
       
-      expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
-      expect(component.applicationStatus()).toBeNull();
+      expect(mockAuthService.isRecruiter).toHaveBeenCalled();
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
     });
   });
 
-  describe('Navigation', () => {
+  describe('Application Count', () => {
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    it('should return 0 when no applications exist', () => {
+      const count = component.getApplicationCount();
+      expect(count).toBe(0);
+    });
+
+    it('should return correct count when applications exist', () => {
+      const mockCandidates = [
+        { id: '1', firstName: 'John', lastName: 'Doe', email: 'john@test.com' },
+        { id: '2', firstName: 'Jane', lastName: 'Smith', email: 'jane@test.com' }
+      ];
+      localStorage.setItem('mockCandidates', JSON.stringify(mockCandidates));
+      
+      const count = component.getApplicationCount();
+      expect(count).toBe(2);
+    });
+  });
+
+  describe('Navigation Actions', () => {
     it('should navigate to registration when startApplication is called', () => {
       component.startApplication();
       
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/register']);
     });
 
-    it('should navigate to registration when addApplication is called', () => {
-      const testEmail = 'test@example.com';
-      component.candidateEmail.set(testEmail);
-      
-      component.addApplication();
-      
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/register'], { queryParams: { email: testEmail, mode: 'new' } });
-    });
-
-    it('should navigate to applications manager when manageApplications is called', () => {
-      const testEmail = 'test@example.com';
-      component.candidateEmail.set(testEmail);
-      
+    it('should navigate to applications when manageApplications is called', () => {
       component.manageApplications();
       
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/applications'], { queryParams: { email: testEmail } });
-    });
-  });
-
-  describe('Authentication Actions', () => {
-    it('should clear application data and logout when newApplication is called', () => {
-      component.newApplication();
-      
-      expect(mockAuthService.clearApplicationData).toHaveBeenCalled();
-      expect(mockAuthService.logout).toHaveBeenCalled();
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/register']);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/applications']);
     });
   });
 
   describe('Template Rendering', () => {
-    it('should display application status when user is candidate', () => {
-      mockAuthService.isCandidate.and.returnValue(true);
-      const mockUser = { email: 'test@example.com', role: 'candidate' as const, id: '1', loginTime: Date.now() };
-      const mockStatus = {
-        id: 'test-app-2',
-        email: 'test@example.com',
-        submissionDate: Date.now(),
-        canEdit: true,
-        daysLeft: 2
-      };
+    it('should display apply button', () => {
+      mockAuthService.isRecruiter.and.returnValue(false);
       
-      mockAuthService.getCurrentUser.and.returnValue(mockUser);
-      mockAuthService.getApplicationStatus.and.returnValue(mockStatus);
-      
-      component.ngOnInit();
-      fixture.detectChanges();
-      
-      const compiled = fixture.nativeElement as HTMLElement;
-      const statusCard = compiled.querySelector('.status-card');
-      
-      expect(statusCard).toBeTruthy();
-    });
-
-    it('should display apply button when user has not applied', () => {
-      mockAuthService.getCurrentUser.and.returnValue(null);
-      
-      component.ngOnInit();
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement as HTMLElement;
       const applyButton = compiled.querySelector('.cta-button');
       
       expect(applyButton).toBeTruthy();
+      expect(applyButton?.textContent).toContain('Apply Now');
     });
-  });
 
-  describe('Mission Cards', () => {
-    it('should display all mission cards', () => {
+    it('should display manage applications button when applications exist', () => {
+      mockAuthService.isRecruiter.and.returnValue(false);
+      const mockCandidates = [{ id: '1', firstName: 'Test', lastName: 'User' }];
+      localStorage.setItem('mockCandidates', JSON.stringify(mockCandidates));
+      
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement as HTMLElement;
-      const missionCards = compiled.querySelectorAll('.mission-card');
+      const manageButton = compiled.querySelector('.cosmic-button.secondary');
       
-      expect(missionCards.length).toBe(3);
+      expect(manageButton).toBeTruthy();
+      expect(manageButton?.textContent).toContain('Manage My Applications');
     });
 
-    it('should display correct mission card content', () => {
+    it('should not display manage applications button when no applications exist', () => {
+      mockAuthService.isRecruiter.and.returnValue(false);
+      localStorage.clear();
+      
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement as HTMLElement;
-      const firstCard = compiled.querySelector('.mission-card');
+      const manageButton = compiled.querySelector('.cosmic-button.secondary');
       
-      expect(firstCard?.textContent).toContain('Exploration');
-    });
-  });
-
-  describe('Requirements Section', () => {
-    it('should display all requirement items', () => {
-      fixture.detectChanges();
-      
-      const compiled = fixture.nativeElement as HTMLElement;
-      const requirementItems = compiled.querySelectorAll('.requirement-item');
-      
-      expect(requirementItems.length).toBe(4);
-    });
-
-    it('should display requirement titles correctly', () => {
-      fixture.detectChanges();
-      
-      const compiled = fixture.nativeElement as HTMLElement;
-      const firstReqTitle = compiled.querySelector('.req-title');
-      
-      expect(firstReqTitle?.textContent).toContain('Physical Fitness');
+      expect(manageButton).toBeFalsy();
     });
   });
 });
