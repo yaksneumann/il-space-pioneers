@@ -67,6 +67,7 @@ export class RegistrationComponent implements OnInit {
   profileImageFilename?: string;
   selectedResume?: File;
   resumeError?: string;
+  formError?: string;
 
   ngOnInit(): void {
     this.scrollToTop();
@@ -94,6 +95,17 @@ export class RegistrationComponent implements OnInit {
     this.city = this.registrationForm.get('city')!;
     this.hobbies = this.registrationForm.get('hobbies')!;
     this.motivation = this.registrationForm.get('motivation')!;
+
+    this.email.valueChanges.subscribe(() => {
+      if (this.formError) {
+        this.clearFormError();
+        if (this.email.hasError('duplicate')) {
+          this.email.setErrors(this.email.hasError('required') || this.email.hasError('email') 
+            ? { required: this.email.hasError('required'), email: this.email.hasError('email') } 
+            : null);
+        }
+      }
+    });
   }
 
   private async checkEditMode(): Promise<void> {
@@ -145,29 +157,7 @@ export class RegistrationComponent implements OnInit {
       }
     }
 
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser?.role === 'candidate') {
-      const appStatus = this.authService.getApplicationStatus(currentUser.email);
-      
-      if (appStatus) {
-        this.mode.set('edit');
-        this.editTimeRemaining = this.authService.getEditTimeRemaining(currentUser.email);
-        
-        if (appStatus.canEdit) {
-          try {
-            const candidate = this.getCandidateByEmailFromLocalStorage(currentUser.email);
-            if (candidate) {
-              this.candidateData.set(candidate);
-              this.populateFormWithCandidateData(candidate);
-            }
-          } catch (error) {
-            console.error('Error loading candidate for edit:', error);
-          }
-        } else {
-          this.router.navigate(['/candidate'], { queryParams: { email: currentUser.email } });
-        }
-      }
-    }
+    this.mode.set('new');
   }
 
   private populateFormWithCandidateData(candidate: Candidate): void {
@@ -329,6 +319,14 @@ export class RegistrationComponent implements OnInit {
       return;
     }
 
+    const emailValue = this.registrationForm.get('email')?.value?.trim();
+    if (emailValue && this.mode() === 'new') {
+      if (this.authService.hasExistingApplication(emailValue)) {
+        this.showDuplicateEmailError(emailValue);
+        return;
+      }
+    }
+
     this.isSubmitting.set(true);
 
     try {
@@ -352,6 +350,7 @@ export class RegistrationComponent implements OnInit {
       }
     } catch (error) {
       console.error('Error submitting form:', error);
+      this.formError = 'An error occurred while submitting your application. Please try again.';
     } finally {
       this.isSubmitting.set(false);
       try {
@@ -359,6 +358,22 @@ export class RegistrationComponent implements OnInit {
       } catch (err) {
       }
     }
+  }
+
+  private showDuplicateEmailError(email: string): void {
+    this.formError = `An application already exists for the email address "${email}". Each email address can only be used for one application. Please use a different email address.`;
+    
+    this.scrollToTop();
+    
+    const emailControl = this.registrationForm.get('email');
+    if (emailControl) {
+      emailControl.setErrors({ 'duplicate': true });
+      emailControl.markAsTouched();
+    }
+  }
+
+  clearFormError(): void {
+    this.formError = undefined;
   }
 
   private convertFileToBase64(file?: File): Promise<string | undefined> {
@@ -378,7 +393,32 @@ export class RegistrationComponent implements OnInit {
   }
 
   submitAnotherApplication(): void {
-    this.router.navigate(['/applications']);
+    this.resetFormToNew();
+    
+    this.router.navigate(['/register']).then(() => {
+      this.ngOnInit();
+    });
+  }
+
+  private resetFormToNew(): void {
+    this.mode.set('new');
+    this.candidateData.set(null);
+    this.currentStep.set(1);
+    this.isSubmitting.set(false);
+    this.isSubmitted.set(false);
+    
+    this.registrationForm.reset();
+    this.registrationForm.enable();
+    
+    this.selectedImage = undefined;
+    this.imagePreview = undefined;
+    this.imageError = undefined;
+    this.profileImageFilename = undefined;
+    this.selectedResume = undefined;
+    this.resumeError = undefined;
+    this.formError = undefined;
+    this.editTimeRemaining = '';
+    this.candidateToken = null;
   }
 
   navigateToApplications(): void {

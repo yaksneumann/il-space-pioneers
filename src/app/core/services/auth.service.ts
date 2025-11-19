@@ -24,6 +24,10 @@ export class AuthService {
     this.loadUserFromStorage();
   }
 
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }
+
   private loadUserFromStorage(): void {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEYS.user);
@@ -94,6 +98,20 @@ export class AuthService {
 
   getCurrentUser(): UserProfile | null {
     return this.currentUser();
+  }
+
+  hasExistingApplication(email: string): boolean {
+    if (!this.isValidEmail(email)) {
+      return false;
+    }
+    
+    try {
+      const applications = this.getAllApplications();
+      return applications.some(app => app.email.toLowerCase() === email.toLowerCase().trim());
+    } catch (error) {
+      console.error('Error checking for existing application:', error);
+      return false;
+    }
   }
 
   saveApplication(candidateData: CandidateData): void {

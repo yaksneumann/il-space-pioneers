@@ -83,6 +83,17 @@
 
           <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="cosmic-form">
           
+          @if (formError) {
+            <div class="form-error-banner">
+              <div class="error-icon">⚠️</div>
+              <div class="error-content">
+                <div class="error-title">Unable to Submit Application</div>
+                <div class="error-message">{{ formError }}</div>
+              </div>
+              <button type="button" class="error-close" (click)="clearFormError()">×</button>
+            </div>
+          }
+          
           <div class="form-step" [class.active]="currentStep() === 1">
             <h3 class="step-title">
               <span class="step-number">01</span>
@@ -419,7 +430,7 @@
                 </button>
               }
 
-              @if (!isViewMode() && currentStep() > 1) {
+              @if (isEditMode() && currentStep() > 1) {
                 <button type="button" 
                         class="nav-button prev-button"
                         (click)="previousStep()">
@@ -429,10 +440,18 @@
                   <span class="btn-icon">📋</span>
                   Back to Applications
                 </button>
-              } @else if (!isViewMode()) {
+              } @else if (isEditMode()) {
                 <button type="button" (click)="navigateToApplications()" class="nav-button back-to-apps-button">
                   <span class="btn-icon">📋</span>
                   Back to Applications
+                </button>
+              }
+
+              @if (mode() === 'new' && currentStep() > 1) {
+                <button type="button" 
+                        class="nav-button prev-button"
+                        (click)="previousStep()">
+                  ← Previous
                 </button>
               }
             </div>
