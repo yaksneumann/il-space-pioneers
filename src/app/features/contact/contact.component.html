@@ -19,14 +19,19 @@
         
         <div class="form-container">
           <div class="form-card cosmic-card">
-            @if (isSubmitted) {
+            @if (isSubmitted()) {
               <div class="success-message">
+                <button (click)="closeSuccessMessage()" class="close-button" type="button">×</button>
                 <div class="success-icon">✅</div>
                 <h3 class="cosmic-subtitle">Message Sent Successfully!</h3>
                 <p class="cosmic-body">
                   Thank you for contacting IISA. Our team will review your message and 
                   get back to you within 24-48 hours.
                 </p>
+                <button (click)="closeSuccessMessage()" class="cosmic-button secondary">
+                  <span class="btn-icon">📝</span>
+                  <span>Send Another Message</span>
+                </button>
               </div>
             } @else {
               <h2 class="cosmic-subtitle form-title">Send us a Message</h2>
@@ -91,9 +96,9 @@
                   <button 
                     type="submit" 
                     class="cosmic-button submit-button"
-                    [disabled]="!isFormValid() || isSubmitting || isSubmitted"
+                    [disabled]="!isFormValid() || isSubmitting() || isSubmitted()"
                   >
-                    @if (isSubmitting) {
+                    @if (isSubmitting()) {
                       <span class="btn-icon">⏳</span>
                       <span>Sending...</span>
                     } @else {

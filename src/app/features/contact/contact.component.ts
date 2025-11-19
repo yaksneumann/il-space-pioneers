@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ContactForm } from '../../core/models/candidate.model';
 
@@ -16,8 +16,8 @@ export class ContactComponent implements OnInit {
     message: ''
   };
 
-  isSubmitting = false;
-  isSubmitted = false;
+  isSubmitting = signal(false);
+  isSubmitted = signal(false);
 
   subjectOptions = [
     { value: '', label: 'Select a subject...' },
@@ -40,17 +40,18 @@ export class ContactComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isFormValid()) {
-      this.isSubmitting = true;
+      this.isSubmitting.set(true);
       
       setTimeout(() => {
-        this.isSubmitting = false;
-        this.isSubmitted = true;
-        
-        setTimeout(() => {
-          this.resetForm();
-        }, 3000);
-      }, 1500);
+        this.isSubmitting.set(false);
+        this.isSubmitted.set(true);
+      }, 500);
     }
+  }
+
+  closeSuccessMessage(): void {
+    this.isSubmitted.set(false);
+    this.resetForm();
   }
 
   isFormValid(): boolean {
@@ -67,7 +68,7 @@ export class ContactComponent implements OnInit {
       subject: '',
       message: ''
     };
-    this.isSubmitted = false;
-    this.isSubmitting = false;
+    this.isSubmitted.set(false);
+    this.isSubmitting.set(false);
   }
 }

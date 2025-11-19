@@ -1,10 +1,3 @@
-export interface AuthToken {
-  candidateId: string;
-  email: string;
-  expiresAt: Date;
-  createdAt: Date;
-}
-
 export interface UserProfile {
   id: string;
   email: string;

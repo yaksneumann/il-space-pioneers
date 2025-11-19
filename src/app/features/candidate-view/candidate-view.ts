@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -14,7 +14,6 @@ export class CandidateViewComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
-  private readonly cdr = inject(ChangeDetectorRef);
   private readonly EDIT_DEADLINE_DAYS = 3;
   private readonly MS_PER_DAY = 24 * 60 * 60 * 1000;
   private readonly LOCAL_STORAGE_KEY = 'mockCandidates';

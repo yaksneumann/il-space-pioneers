@@ -1,19 +1,18 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '@env';
-import { AuthToken, UserProfile, CandidateApplication, CandidateData } from '../models/auth.model';
+import { UserProfile, CandidateApplication, CandidateData } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly TOKEN_KEY = 'iisa_candidate_token';
-  private readonly USER_KEY = 'il_space_pioneers_user';
-  private readonly APPLICATION_KEY = 'il_space_pioneers_application';
-  private readonly TOKEN_DURATION_DAYS = 3;
+  private readonly EDIT_DURATION_DAYS = 3;
   private readonly MS_PER_DAY = 24 * 60 * 60 * 1000;
-  private readonly MS_PER_HOUR = 60 * 60 * 1000;
-  private readonly MS_PER_MINUTE = 60 * 1000;
+  private readonly STORAGE_KEYS = {
+    applications: 'il_space_pioneers_application',
+    user: 'il_space_pioneers_user'
+  } as const;
 
   private router = inject(Router);
   private currentUser = signal<UserProfile | null>(null);
@@ -27,7 +26,7 @@ export class AuthService {
 
   private loadUserFromStorage(): void {
     try {
-      const stored = localStorage.getItem(this.USER_KEY);
+      const stored = localStorage.getItem(this.STORAGE_KEYS.user);
       if (stored) {
         const user: UserProfile = JSON.parse(stored);
         this.setCurrentUser(user);
@@ -44,22 +43,21 @@ export class AuthService {
     this.userRole.set(user?.role || null);
     
     if (user) {
-      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      localStorage.setItem(this.STORAGE_KEYS.user, JSON.stringify(user));
     } else {
-      localStorage.removeItem(this.USER_KEY);
-      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem(this.STORAGE_KEYS.user);
     }
   }
 
   loginRecruiter(email: string, password: string): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        if (email === environment.auth.recruiterEmail && 
-            password === environment.auth.recruiterPassword) {
+        if (email.trim() === environment.auth.recruiterEmail && 
+            password.trim() === environment.auth.recruiterPassword) {
           
           const user: UserProfile = {
-            id: 'recruiter-1',
-            email: email,
+            id: 'recruiter',
+            email: email.trim(),
             role: 'recruiter',
             loginTime: Date.now()
           };
@@ -69,14 +67,14 @@ export class AuthService {
         } else {
           resolve(false);
         }
-      }, 800);
+      }, 500);
     });
   }
 
   setCandidateIdentity(email: string): void {
     const user: UserProfile = {
-      id: `candidate-${Date.now()}`,
-      email: email,
+      id: 'candidate',
+      email: email.trim(),
       role: 'candidate',
       loginTime: Date.now()
     };
@@ -85,10 +83,8 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.USER_KEY);
-    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.STORAGE_KEYS.user);
     this.setCurrentUser(null);
-    this.clearCandidateToken();
     this.router.navigate(['/']);
   }
 
@@ -96,16 +92,8 @@ export class AuthService {
     return this.userRole() === 'recruiter';
   }
 
-  isCandidate(): boolean {
-    return this.userRole() === 'candidate';
-  }
-
   getCurrentUser(): UserProfile | null {
     return this.currentUser();
-  }
-
-  getCurrentUserSignal() {
-    return this.currentUser;
   }
 
   saveApplication(candidateData: CandidateData): void {
@@ -117,7 +105,7 @@ export class AuthService {
         email: candidateData.email,
         submissionDate: Date.now(),
         canEdit: true,
-        daysLeft: this.TOKEN_DURATION_DAYS
+        daysLeft: this.EDIT_DURATION_DAYS
       };
 
       const existingApplications = this.getAllApplications();
@@ -125,16 +113,16 @@ export class AuthService {
       const updatedApplications = existingApplications.filter((app: CandidateApplication) => app.id !== applicationId);
       updatedApplications.push(applicationData);
 
-      localStorage.setItem(this.APPLICATION_KEY, JSON.stringify(updatedApplications));
+      localStorage.setItem(this.STORAGE_KEYS.applications, JSON.stringify(updatedApplications));
       this.setCandidateIdentity(candidateData.email);
     } catch (error) {
       console.error('Error saving application:', error);
     }
   }
 
-  getAllApplications(): CandidateApplication[] {
+  private getAllApplications(): CandidateApplication[] {
     try {
-      const stored = localStorage.getItem(this.APPLICATION_KEY);
+      const stored = localStorage.getItem(this.STORAGE_KEYS.applications);
       if (!stored) return [];
 
       const parsed = JSON.parse(stored);
@@ -170,7 +158,7 @@ export class AuthService {
       const mostRecentApp = userApplications.sort((a, b) => b.submissionDate - a.submissionDate)[0];
       
       const daysPassed = Math.floor((Date.now() - mostRecentApp.submissionDate) / this.MS_PER_DAY);
-      const daysLeft = Math.max(0, this.TOKEN_DURATION_DAYS - daysPassed);
+      const daysLeft = Math.max(0, this.EDIT_DURATION_DAYS - daysPassed);
       
       return {
         ...mostRecentApp,
@@ -183,82 +171,21 @@ export class AuthService {
     }
   }
 
-  getApplicationsByEmail(email: string): CandidateApplication[] {
-    return this.getAllApplications().filter(app => app.email === email);
-  }
-
-  hasApplied(email?: string): boolean {
-    if (!email) return false;
-    return this.getApplicationsByEmail(email).length > 0;
-  }
-
-  clearApplicationData(email?: string): void {
-    if (email) {
-      const allApplications = this.getAllApplications();
-      const filteredApplications = allApplications.filter((app: CandidateApplication) => app.email !== email);
-      localStorage.setItem(this.APPLICATION_KEY, JSON.stringify(filteredApplications));
-    } else {
-      localStorage.removeItem(this.APPLICATION_KEY);
-    }
-  }
-
-  generateCandidateToken(candidateId: string, email: string): string {
-    const token: AuthToken = {
-      candidateId,
-      email,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + this.TOKEN_DURATION_DAYS * this.MS_PER_DAY)
-    };
-
-    const tokenString = btoa(JSON.stringify(token));
-    localStorage.setItem(this.TOKEN_KEY, tokenString);
-    
-    return tokenString;
-  }
-
-  getCandidateToken(): AuthToken | null {
-    try {
-      const tokenString = localStorage.getItem(this.TOKEN_KEY);
-      if (!tokenString) return null;
-
-      const token: AuthToken = JSON.parse(atob(tokenString));
-      
-      if (new Date() > new Date(token.expiresAt)) {
-        this.clearCandidateToken();
-        return null;
-      }
-
-      return token;
-    } catch (error) {
-      console.error('Invalid token format:', error);
-      this.clearCandidateToken();
-      return null;
-    }
-  }
-
-  canCandidateEdit(email?: string): boolean {
+  getEditTimeRemaining(email?: string): string {
     const appStatus = this.getApplicationStatus(email);
-    if (appStatus) {
-      return appStatus.canEdit;
-    }
-    
-    const token = this.getCandidateToken();
-    return token !== null;
-  }
+    if (!appStatus || !appStatus.canEdit) return '';
 
-  getEditTimeRemaining(): string {
-    const token = this.getCandidateToken();
-    if (!token) return '';
+    const msPerHour = this.MS_PER_DAY / 24;
+    const msPerMinute = msPerHour / 60;
+    const elapsed = Date.now() - appStatus.submissionDate;
+    const totalEditTime = this.EDIT_DURATION_DAYS * this.MS_PER_DAY;
+    const remaining = totalEditTime - elapsed;
 
-    const now = new Date();
-    const expiresAt = new Date(token.expiresAt);
-    const diffMs = expiresAt.getTime() - now.getTime();
+    if (remaining <= 0) return 'Expired';
 
-    if (diffMs <= 0) return 'Expired';
-
-    const days = Math.floor(diffMs / this.MS_PER_DAY);
-    const hours = Math.floor((diffMs % this.MS_PER_DAY) / this.MS_PER_HOUR);
-    const minutes = Math.floor((diffMs % this.MS_PER_HOUR) / this.MS_PER_MINUTE);
+    const days = Math.floor(remaining / this.MS_PER_DAY);
+    const hours = Math.floor((remaining % this.MS_PER_DAY) / msPerHour);
+    const minutes = Math.floor((remaining % msPerHour) / msPerMinute);
 
     if (days > 0) {
       return `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''}`;
@@ -267,19 +194,5 @@ export class AuthService {
     } else {
       return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
     }
-  }
-
-  clearCandidateToken(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-  }
-
-  generateCandidateUrl(token: string): string {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/?token=${token}`;
-  }
-
-  getTokenFromUrl(): string | null {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('token');
   }
 }

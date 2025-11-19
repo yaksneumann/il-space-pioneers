@@ -32,7 +32,7 @@
           </p>
         </div>
 
-        @if (!isEditMode()) {
+        @if (!isEditMode() && !isViewMode()) {
             <div class="progress-container">
               <div class="progress-bar">
                 <div class="progress-fill" [style.width.%]="formProgress()"></div>
@@ -97,7 +97,7 @@
                   type="text"
                   formControlName="firstName"
                   class="cosmic-input"
-                  placeholder="Enter your first name"
+                  placeholder="Enter your legal first name"
                   [class.error]="firstName.invalid && firstName.touched"
                 />
                 @if (firstName.invalid && firstName.touched) {
@@ -112,7 +112,7 @@
                   type="text"
                   formControlName="lastName"
                   class="cosmic-input"
-                  placeholder="Enter your last name"
+                  placeholder="Enter your legal last name"
                   [class.error]="lastName.invalid && lastName.touched"
                 />
                 @if (lastName.invalid && lastName.touched) {
@@ -127,7 +127,7 @@
                   type="email"
                   formControlName="email"
                   class="cosmic-input"
-                  placeholder="your.email@example.com"
+                  placeholder="e.g., candidate@gmail.com or name@company.co.il"
                   [class.error]="email.invalid && email.touched"
                 />
                 @if (email.invalid && email.touched) {
@@ -164,7 +164,7 @@
                   type="number"
                   formControlName="age"
                   class="cosmic-input"
-                  placeholder="25"
+                  placeholder="Age between 18-65"
                   min="18"
                   max="65"
                   [class.error]="age.invalid && age.touched"
@@ -191,7 +191,7 @@
                   type="text"
                   formControlName="city"
                   class="cosmic-input"
-                  placeholder="Tel Aviv"
+                  placeholder="e.g., Tel Aviv, Jerusalem, Haifa, Beer Sheva"
                   [class.error]="city.invalid && city.touched"
                 />
                 @if (city.invalid && city.touched) {
@@ -214,7 +214,7 @@
                   id="hobbies"
                   formControlName="hobbies"
                   class="cosmic-textarea"
-                  placeholder="Share your hobbies, interests, and activities that make you unique..."
+                  placeholder="e.g., Aviation, STEM, sports, photography, astronomy, technology, outdoor activities..."
                   rows="4"
                   [class.error]="hobbies.invalid && hobbies.touched"
                 ></textarea>
@@ -232,7 +232,7 @@
                   id="motivation"
                   formControlName="motivation"
                   class="cosmic-textarea"
-                  placeholder="Explain why you would be the perfect candidate for Israel's first space mission..."
+                  placeholder="Share your qualifications, skills, experience, and passion for space exploration. What makes you ideal for this historic mission?"
                   rows="6"
                   [class.error]="motivation.invalid && motivation.touched"
                 ></textarea>
@@ -495,13 +495,8 @@
               <h3>Application {{ isEditMode() ? 'Updated' : 'Submitted' }} Successfully!</h3>
               @if (!isEditMode()) {
                 <p>
-                  Welcome to the Israeli Space Mission! Your application has been received.
+                  Welcome to the Israeli Space Mission! Your application has been received.<br>
                   You can submit additional applications or edit this one within 3 days.
-                </p>
-              }
-              @if (isEditMode()) {
-                <p>
-                  Your application has been updated successfully. You can continue to edit it within 3 days of the original submission.
                 </p>
               } @else {
                 <p>

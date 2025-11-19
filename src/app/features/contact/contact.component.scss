@@ -72,6 +72,44 @@
 .success-message {
   text-align: center;
   padding: 2rem 0;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid $border-color;
+  color: $text-primary;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: $transition-base;
+  line-height: 1;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: $primary-color;
+    transform: scale(1.1);
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    top: 0.25rem;
+    right: 0.25rem;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.25rem;
+    padding: 0.25rem;
+  }
 }
 
 .success-icon {

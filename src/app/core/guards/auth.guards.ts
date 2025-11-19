@@ -27,7 +27,7 @@ export class CandidateGuard implements CanActivate {
   private router = inject(Router);
 
   canActivate(): boolean {
-    if (this.authService.isCandidate()) {
+    if (!this.authService.isRecruiter()) {
       return true;
     }
     

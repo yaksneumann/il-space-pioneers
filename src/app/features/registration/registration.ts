@@ -61,7 +61,6 @@ export class RegistrationComponent implements OnInit {
   
   editTimeRemaining = '';
   candidateToken: string | null = null;
-  
   selectedImage?: File;
   imagePreview?: string;
   imageError?: string;
@@ -95,14 +94,6 @@ export class RegistrationComponent implements OnInit {
     this.city = this.registrationForm.get('city')!;
     this.hobbies = this.registrationForm.get('hobbies')!;
     this.motivation = this.registrationForm.get('motivation')!;
-    
-    this.email.valueChanges.subscribe((value) => {
-    });
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
 
   private async checkEditMode(): Promise<void> {
@@ -154,36 +145,13 @@ export class RegistrationComponent implements OnInit {
       }
     }
 
-    const urlToken = this.authService.getTokenFromUrl();
-    if (urlToken) {
-      localStorage.setItem('iisa_candidate_token', urlToken);
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    const token = this.authService.getCandidateToken();
-    if (token) {
-      this.mode.set('edit');
-      this.candidateToken = btoa(JSON.stringify(token));
-      this.editTimeRemaining = this.authService.getEditTimeRemaining();
-      
-      try {
-        const candidate = this.getCandidateByEmailFromLocalStorage(token.email);
-        if (candidate) {
-          this.candidateData.set(candidate);
-          this.populateFormWithCandidateData(candidate);
-        }
-      } catch (error) {
-        console.error('Error loading candidate for edit:', error);
-      }
-      return;
-    }
-
     const currentUser = this.authService.getCurrentUser();
     if (currentUser?.role === 'candidate') {
       const appStatus = this.authService.getApplicationStatus(currentUser.email);
       
       if (appStatus) {
         this.mode.set('edit');
+        this.editTimeRemaining = this.authService.getEditTimeRemaining(currentUser.email);
         
         if (appStatus.canEdit) {
           try {
@@ -356,17 +324,6 @@ export class RegistrationComponent implements OnInit {
     this.selectedResume = file;
   }
 
-  getFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    
-    const units = ['Bytes', 'KB', 'MB', 'GB'];
-    const base = 1024;
-    const unitIndex = Math.floor(Math.log(bytes) / Math.log(base));
-    const size = (bytes / Math.pow(base, unitIndex)).toFixed(2);
-    
-    return `${parseFloat(size)} ${units[unitIndex]}`;
-  }
-
   async onSubmit(): Promise<void> {
     if (this.registrationForm.invalid || this.isSubmitting() || this.isViewMode()) {
       return;
@@ -389,8 +346,7 @@ export class RegistrationComponent implements OnInit {
       if (result) {
         this.isSubmitted.set(true);
         this.authService.saveApplication(result);
-        this.candidateToken = this.authService.generateCandidateToken(result.id!, result.email);
-        this.editTimeRemaining = this.authService.getEditTimeRemaining();
+        this.editTimeRemaining = this.authService.getEditTimeRemaining(result.email);
       } else {
         throw new Error('Failed to submit application');
       }
@@ -427,34 +383,6 @@ export class RegistrationComponent implements OnInit {
 
   navigateToApplications(): void {
     this.router.navigate(['/applications']);
-  }
-
-  private removeCandidateFromStorage(email: string): void {
-    try {
-      const candidatesKey = 'mockCandidates';
-      const stored = localStorage.getItem(candidatesKey);
-      if (stored) {
-        const candidates = JSON.parse(stored);
-        const filteredCandidates = candidates.filter((c: any) => c.email !== email);
-        localStorage.setItem(candidatesKey, JSON.stringify(filteredCandidates));
-      }
-    } catch (error) {
-      console.warn('Error removing candidate from localStorage:', error);
-    }
-  }
-
-  private removeAllCandidatesFromStorage(email: string): void {
-    try {
-      const candidatesKey = 'mockCandidates';
-      const stored = localStorage.getItem(candidatesKey);
-      if (stored) {
-        const candidates = JSON.parse(stored);
-        const filteredCandidates = candidates.filter((c: any) => c.email !== email);
-        localStorage.setItem(candidatesKey, JSON.stringify(filteredCandidates));
-      }
-    } catch (error) {
-      console.warn('Error removing all candidates from localStorage:', error);
-    }
   }
 
   private getCandidateByEmailFromLocalStorage(email: string): Candidate | null {

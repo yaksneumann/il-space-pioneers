@@ -1,28 +1,24 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-recruiter-login',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './recruiter-login.component.html',
   styleUrl: './recruiter-login.component.scss'
 })
 export class RecruiterLoginComponent {
-  credentials = {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  
+  protected isLoading = signal(false);
+  protected errorMessage = signal('');
+  protected credentials = {
     email: '',
     password: ''
   };
-
-  isLoading = signal(false);
-  errorMessage = signal('');
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
 
   isFormValid(): boolean {
     return this.credentials.email.length > 0 && 
@@ -35,23 +31,18 @@ export class RecruiterLoginComponent {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    try {
-      const success = await this.authService.loginRecruiter(
-        this.credentials.email,
-        this.credentials.password
-      );
+    const success = await this.authService.loginRecruiter(
+      this.credentials.email,
+      this.credentials.password
+    );
 
-      if (success) {
-        this.router.navigate(['/dashboard']);
-      } else {
-        this.errorMessage.set('Invalid credentials. Please try again.');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      this.errorMessage.set('An error occurred. Please try again.');
-    } finally {
-      this.isLoading.set(false);
+    if (success) {
+      this.router.navigate(['/dashboard']);
+    } else {
+      this.errorMessage.set('Invalid credentials. Please try again.');
     }
+    
+    this.isLoading.set(false);
   }
 
   goToRegistration(): void {
